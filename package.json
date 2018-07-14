@@ -1,0 +1,29 @@
+{
+  "name": "js-3d-model-viewer",
+  "version": "0.1.0",
+  "description": "A web player to display 3D models in the browser ",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cgwire/js-3d-model-viewer.git"
+  },
+  "keywords": [
+    "3d",
+    "viewer",
+    "model",
+    "character",
+    "props"
+  ],
+  "author": "Frank Rousseau <gelnior@free.fr> (https://blog.addictedtointer.net/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cgwire/js-3d-model-viewer/issues"
+  },
+  "homepage": "https://github.com/cgwire/js-3d-model-viewer#readme",
+  "dependencies": {
+    "three": "0.94.0"
+  }
+}
