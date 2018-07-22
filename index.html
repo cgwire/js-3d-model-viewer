@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Javascript 3D Model Player</title>
+  </head>
+  <body>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: white;
+      }
+      p {
+        margin: 0;
+        padding: 0;
+      }
+      .left,
+      .right {
+        position: absolute;
+        color: #fff;
+        font-family: Geneva, sans-serif;
+      }
+      .left {
+        bottom: 1em;
+        left: 1em;
+        text-align: left;
+      }
+      .right {
+        top: 0;
+        right: 0;
+        text-align: right;
+      }
+      a {
+        color: #f58231;
+      }
+      #player {
+        width: 100%; 
+        height: 400px; 
+        margin: auto; 
+        background: #000000;
+        margin-top: 2em;
+      }
+      .button {
+        border-radius: 0.2em;
+        background-color: white;
+        color: #3CB371;
+        border: 3px solid #3CB371;
+        font-weight: bold;
+        padding: 1em;
+      }
+      .center {
+        text-align: center;
+        margin-top: 2em;
+      }
+      canvas {
+        display: block;
+      }
+      pre {
+        padding: 1em;
+        max-width: 900px;
+        margin: auto;
+        margin-top: 4em;
+        background-color: #EEE;
+        font-size: 1.5em;
+			}
+	</style>
+</head>
+<body>
+  <div class="content">
+    <div id="player" style="">
+    </div>
+    <div class="center">
+      <button class="button" id="fullscreen-button">
+        Go Full Screen
+      </button>
+    </div>
+    <pre>
+var modelPlayer = require('js-3d-model-player')
+modelPlayer.prepareScene(document.getElementById('player'));
+modelPlayer.loadObject('./assets/sample.obj');
+
+var fullScreenButton = document.getElementById('fullscreen-button')
+fullScreenButton.addEventListener('click', function () {
+  modelPlayer.goFullScreen();
+})</pre>
+  </div>
+  <script src="./dist/js-3d-model-player.js"></script>
+  <script>
+  var modelPlayer = this['js-3d-model-player'];
+  modelPlayer.prepareScene(document.getElementById('player'))
+  modelPlayer.loadObject('./assets/sample.obj')
+
+  var fullScreenButton = document.getElementById('fullscreen-button')
+  fullScreenButton.addEventListener('click', function () {
+    modelPlayer.goFullScreen()
+  })
+  </script>
+</body>
