@@ -1,4 +1,4 @@
-# Javascript 3D Model player 
+# Javascript 3D Model Viewer 
 
 A web player to display 3D models in the browser.
 
