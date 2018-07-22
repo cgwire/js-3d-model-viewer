@@ -3,13 +3,6 @@ import OBJLoader from 'three-obj-loader'
 const OrbitControls = require('three-orbit-controls')(THREE)
 OBJLoader(THREE)
 
-const hasWebkitFullScreen = 'webkitCancelFullScreen' in document
-const hasMozFullScreen = 'mozCancelFullScreen' in document
-const scene = new THREE.Scene()
-let renderer = null
-let element = null
-let camera = null
-
 const setCamera = (aspect) => {
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -75,19 +68,25 @@ const render = (element, renderer, scene, camera) => {
 }
 
 const prepareScene = (domElement) => {
-  const width = domElement.offsetWidth
-  const height = domElement.offsetHeight
+  const scene = new THREE.Scene()
+  const element = domElement
+  const width = element.offsetWidth
+  const height = element.offsetHeight
 
-  element = domElement
-  camera = setCamera(width / height)
-  renderer = setRenderer(width, height)
+  const camera = setCamera(width / height)
+  const renderer = setRenderer(width, height, scene, camera)
   setLights(scene)
   setControls(camera, renderer)
   render(element, renderer, scene, camera)
-  window.addEventListener('resize', onWindowResize, false)
+  window.addEventListener(
+    'resize',
+    onWindowResize(element, camera, renderer),
+    false
+  )
+  return scene
 }
 
-const loadObject = (url) => {
+const loadObject = (scene, url) => {
   const objLoader = new THREE.OBJLoader()
   const material = new THREE.MeshPhongMaterial({ color: 0xbbbbcc })
   objLoader.load(url, (obj) => {
@@ -101,7 +100,7 @@ const loadObject = (url) => {
   return objLoader
 }
 
-const clearScene = () => {
+const clearScene = (scene) => {
   scene.children.forEach((obj) => {
     if (obj.type === 'Group') {
       scene.remove(obj)
@@ -109,7 +108,10 @@ const clearScene = () => {
   })
 }
 
-const goFullScreen = () => {
+const goFullScreen = (element) => {
+  const hasWebkitFullScreen = 'webkitCancelFullScreen' in document
+  const hasMozFullScreen = 'mozCancelFullScreen' in document
+
   if (hasWebkitFullScreen) {
     return element.webkitRequestFullScreen()
   } else if (hasMozFullScreen) {
@@ -119,7 +121,7 @@ const goFullScreen = () => {
   }
 }
 
-const onWindowResize = () => {
+const onWindowResize = (element, camera, renderer) => () => {
   const width = element.offsetWidth
   const height = element.offsetHeight
   const aspect = width / height

@@ -76,24 +76,26 @@
       </button>
     </div>
     <pre>
-var modelPlayer = require('js-3d-model-player')
-modelPlayer.prepareScene(document.getElementById('player'));
-modelPlayer.loadObject('./assets/sample.obj');
+var modelPlayer = this['js-3d-model-player'];
+var playerElement = document.getElementById('player')
+var scene = modelPlayer.prepareScene(playerElement)
+modelPlayer.loadObject(scene, './assets/sample.obj')
 
 var fullScreenButton = document.getElementById('fullscreen-button')
 fullScreenButton.addEventListener('click', function () {
-  modelPlayer.goFullScreen();
+  modelPlayer.goFullScreen(playerElement)
 })</pre>
   </div>
   <script src="./dist/js-3d-model-player.js"></script>
   <script>
   var modelPlayer = this['js-3d-model-player'];
-  modelPlayer.prepareScene(document.getElementById('player'))
-  modelPlayer.loadObject('./assets/sample.obj')
+  var playerElement = document.getElementById('player')
+  var scene = modelPlayer.prepareScene(playerElement)
+  modelPlayer.loadObject(scene, './assets/sample.obj')
 
   var fullScreenButton = document.getElementById('fullscreen-button')
   fullScreenButton.addEventListener('click', function () {
-    modelPlayer.goFullScreen()
+    modelPlayer.goFullScreen(playerElement)
   })
   </script>
 </body>
