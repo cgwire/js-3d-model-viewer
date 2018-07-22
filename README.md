@@ -1,6 +1,6 @@
 # Javascript 3D Model Viewer 
 
-A web player to display 3D models in the browser.
+A web viewer to display 3D models in the browser.
 
 [Demo]()
 
@@ -10,15 +10,15 @@ A web player to display 3D models in the browser.
 Get this library as a dependency:
 
 ```bash
-npm install js-3d-model-player
+npm install js-3d-model-viewer
 ```
 
 Then run this snippet after the HTML of your page is loaded:
 
 ```javascript
-import modelPlayer from 'js-3d-model-player'
-const playerElement = document.getElementById('player')
-const scene = modelPlayer.prepareScene(playerElement)
+import modelPlayer from 'js-3d-model-viewer'
+const viewerElement = document.getElementById('viewer')
+const scene = modelPlayer.prepareScene(viewerElement)
 modelPlayer.loadObject(scene, './assets/sample.obj') // Urls are fine here.
 ```
 
@@ -27,10 +27,10 @@ You're done!
 If you want to go fullscreen, you can do it like this:
 
 ```javascript
-const playerElement = document.getElementById('player')
+const viewerElement = document.getElementById('viewer')
 const fullScreenButton = document.getElementById('fullscreen-button')
 fullScreenButton.addEventListener('click', () => {
-  modelPlayer.goFullScreen(playerElement)
+  modelPlayer.goFullScreen(viewerElement)
 })
 ```
 
@@ -38,19 +38,19 @@ fullScreenButton.addEventListener('click', () => {
  
 CG studios want to be able to perform a quick review of 3D models. Displaying a
 model in the browser could help in solving this problem. On a broader aspect,
-there is no open source 3D model player. Which is sad whent technologies like
+there is no open source 3D model viewer. Which is sad whent technologies like
 WebGL and Three.js allow to display easily 3D geometries.
 
 
 ## Development status
 
-Currently the player supports only `.obj` files and cannot load tetures or 
+Currently the viewer supports only `.obj` files and cannot load tetures or 
 materials.
 
 
 ## Technologies
 
-This player is based on [Three.js](https://threejs.org/)
+This viewer is based on [Three.js](https://threejs.org/)
 
 
 ## Resources
@@ -62,7 +62,7 @@ This player is based on [Three.js](https://threejs.org/)
 
 ## About authors
 
-This player is written by CG Wire, a company based in France. We help small to
+This viewer is written by CG Wire, a company based in France. We help small to
 midsize CG studios to manage their production and build pipeline efficiently.
 
 We apply software craftmanship principles as much as possible. We love coding

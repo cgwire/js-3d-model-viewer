@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Javascript 3D Model Player</title>
+    <title>Javascript 3D Model Viewer</title>
   </head>
   <body>
     <style>
@@ -34,7 +34,7 @@
       a {
         color: #f58231;
       }
-      #player {
+      #viewer {
         width: 100%; 
         height: 400px; 
         margin: auto; 
@@ -68,7 +68,7 @@
 </head>
 <body>
   <div class="content">
-    <div id="player" style="">
+    <div id="viewer" style="">
     </div>
     <div class="center">
       <button class="button" id="fullscreen-button">
@@ -76,26 +76,26 @@
       </button>
     </div>
     <pre>
-var modelPlayer = this['js-3d-model-player'];
-var playerElement = document.getElementById('player')
-var scene = modelPlayer.prepareScene(playerElement)
+var modelPlayer = this['js-3d-model-viewer'];
+var viewerElement = document.getElementById('viewer')
+var scene = modelPlayer.prepareScene(viewerElement)
 modelPlayer.loadObject(scene, './assets/sample.obj')
 
 var fullScreenButton = document.getElementById('fullscreen-button')
 fullScreenButton.addEventListener('click', function () {
-  modelPlayer.goFullScreen(playerElement)
+  modelPlayer.goFullScreen(viewerElement)
 })</pre>
   </div>
-  <script src="./dist/js-3d-model-player.js"></script>
+  <script src="./dist/js-3d-model-viewer.js"></script>
   <script>
-  var modelPlayer = this['js-3d-model-player'];
-  var playerElement = document.getElementById('player')
-  var scene = modelPlayer.prepareScene(playerElement)
+  var modelPlayer = this['js-3d-model-viewer'];
+  var viewerElement = document.getElementById('viewer')
+  var scene = modelPlayer.prepareScene(viewerElement)
   modelPlayer.loadObject(scene, './assets/sample.obj')
 
   var fullScreenButton = document.getElementById('fullscreen-button')
   fullScreenButton.addEventListener('click', function () {
-    modelPlayer.goFullScreen(playerElement)
+    modelPlayer.goFullScreen(viewerElement)
   })
   </script>
 </body>
