@@ -113,20 +113,19 @@ fullScreenButton.addEventListener('click', function () {
   sample1Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.loadObject(scene, './assets/sample.obj')
+    modelPlayer.loadObject(scene, 'https://cgwire.github.io/js-3d-model-viewer//assets/sample.obj')
   })
   var sample2Button = document.getElementById('sample-2-button')
   sample2Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.loadObject(scene, './assets/sample_02.obj')
-    modelPlayer.loadMaterial(scene, './assets/sample_02.mtl')
+    modelPlayer.loadObject(scene, 'https://cgwire.github.io/js-3d-model-viewer//assets/sample_02.obj')
   })
   var sample3Button = document.getElementById('sample-3-button')
   sample3Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.loadObject(scene, './assets/sample_03.obj')
+    modelPlayer.loadObject(scene, 'https://cgwire.github.io/js-3d-model-viewer//assets/sample_03.obj')
   })
   </script>
 </body>
