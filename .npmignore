@@ -1,0 +1,8 @@
+node_modules
+assets
+index.html
+TODO
+webpack.config.js
+test
+dist/*.min.js
+dist/*.min.js.map
