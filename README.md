@@ -2,7 +2,7 @@
 
 A web viewer to display 3D models in the browser.
 
-[Demo]()
+[Demo](https://cgwire.github.io/js-3d-model-viewer/)
 
 
 ## How to run
@@ -44,8 +44,9 @@ WebGL and Three.js allow to display easily 3D geometries.
 
 ## Development status
 
-Currently the viewer supports only `.obj` files and cannot load tetures or 
-materials.
+* Currently the viewer supports only `.obj` files.
+* It cannot load textures or materials.
+* Unit tests are missing
 
 
 ## Technologies
