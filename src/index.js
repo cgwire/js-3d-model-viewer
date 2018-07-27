@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import OBJLoader from 'three-obj-loader'
 const OrbitControls = require('three-orbit-controls')(THREE)
-const MTLLoader = require('three-mtl-loader')
 OBJLoader(THREE)
 
 const setCamera = (aspect) => {
@@ -154,5 +153,5 @@ const fitCameraToObject = (camera, object) => {
 }
 
 export {
-  prepareScene, loadObject, clearScene, resetCamera, goFullScreen, loadMaterial
+  prepareScene, loadObject, clearScene, resetCamera, goFullScreen
 }
