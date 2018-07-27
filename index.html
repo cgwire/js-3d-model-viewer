@@ -10,29 +10,14 @@
         margin: 0;
         padding: 0;
         background: white;
+        font-family: Geneva, sans-serif;
       }
       p {
         margin: 0;
         padding: 0;
       }
-      .left,
-      .right {
-        position: absolute;
-        color: #fff;
-        font-family: Geneva, sans-serif;
-      }
-      .left {
-        bottom: 1em;
-        left: 1em;
-        text-align: left;
-      }
-      .right {
-        top: 0;
-        right: 0;
-        text-align: right;
-      }
       a {
-        color: #f58231;
+        color: #3CB371;
       }
       #viewer {
         width: 100%; 
@@ -62,10 +47,12 @@
         max-width: 900px;
         margin: auto;
         margin-top: 4em;
-        background-color: #EEE;
-        font-size: 1.5em;
+        font-size: 1.2em;
 			}
 	</style>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.min.css">
+  <link href="https://raw.githubusercontent.com/PrismJS/prism-themes/master/themes/prism-hopscotch.css" rel="stylesheet" />
 </head>
 <body>
   <div class="content">
@@ -87,8 +74,8 @@
         Go Full Screen
       </button>
     </div>
-    <pre>
-var modelPlayer = this['js-3d-model-viewer'];
+    <div style="margin: 2em auto; max-width: 900px">
+    <pre><code class="language-javascript">var modelPlayer = this['js-3d-model-viewer'];
 var viewerElement = document.getElementById('viewer')
 var scene = modelPlayer.prepareScene(viewerElement)
 modelPlayer.loadObject(scene, './assets/sample.obj')
@@ -96,8 +83,17 @@ modelPlayer.loadObject(scene, './assets/sample.obj')
 var fullScreenButton = document.getElementById('fullscreen-button')
 fullScreenButton.addEventListener('click', function () {
   modelPlayer.goFullScreen(viewerElement)
-})</pre>
+})</code></pre>
+    </div>
+    <div class="center">
+      <a href="https://github.com/cgwire/js-3d-model-viewer">
+        See sources on Github
+      </a>
+    </div>
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.js"></script>
   <script src="./dist/js-3d-model-viewer.js"></script>
   <script>
   var modelPlayer = this['js-3d-model-viewer'];
