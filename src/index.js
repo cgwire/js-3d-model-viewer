@@ -1,17 +1,17 @@
 import * as THREE from 'three'
 import OBJLoader from 'three-obj-loader'
 const OrbitControls = require('three-orbit-controls')(THREE)
+const MTLLoader = require('three-mtl-loader')
 OBJLoader(THREE)
 
 const setCamera = (aspect) => {
   const camera = new THREE.PerspectiveCamera(
     45,
-    window.innerWidth / window.innerHeight,
+    aspect,
     1,
     1000
   )
   camera.position.z = 5
-  camera.aspect = aspect
   camera.updateProjectionMatrix()
   return camera
 }
@@ -46,6 +46,7 @@ const setControls = (camera, renderer) => {
     renderer.domElement
   )
   controls.enableZoom = true
+  camera.controls = controls
   return controls
 }
 
@@ -75,20 +76,23 @@ const prepareScene = (domElement) => {
 
   const camera = setCamera(width / height)
   const renderer = setRenderer(width, height, scene, camera)
-  setLights(scene)
   setControls(camera, renderer)
+  setLights(scene)
   render(element, renderer, scene, camera)
   window.addEventListener(
     'resize',
     onWindowResize(element, camera, renderer),
     false
   )
+  scene.camera = camera
   return scene
 }
 
-const loadObject = (scene, url) => {
+const loadObject = (scene, url, callback) => {
+  if (scene.locked) return false
   const objLoader = new THREE.OBJLoader()
   const material = new THREE.MeshPhongMaterial({ color: 0xbbbbcc })
+  scene.locked = true
   objLoader.load(url, (obj) => {
     obj.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -96,6 +100,9 @@ const loadObject = (scene, url) => {
       }
     })
     scene.add(obj)
+    fitCameraToObject(scene.camera, obj)
+    scene.locked = false
+    if (callback) callback(obj)
   })
   return objLoader
 }
@@ -106,6 +113,10 @@ const clearScene = (scene) => {
       scene.remove(obj)
     }
   })
+}
+
+const resetCamera = (scene) => {
+  scene.camera.controls.reset()
 }
 
 const goFullScreen = (element) => {
@@ -130,4 +141,18 @@ const onWindowResize = (element, camera, renderer) => () => {
   renderer.setSize(width, height)
 }
 
-export { prepareScene, loadObject, clearScene, goFullScreen }
+const fitCameraToObject = (camera, object) => {
+  const fov = camera.fov
+  const boundingBox = new THREE.Box3()
+  const size = new THREE.Vector3()
+  boundingBox.setFromObject(object)
+  boundingBox.getSize(size)
+
+  let cameraZ = Math.abs(size.y / 2 * Math.tan(fov * 2))
+  camera.position.z = Math.max(cameraZ, size.z) * 1.5
+  camera.updateProjectionMatrix()
+}
+
+export {
+  prepareScene, loadObject, clearScene, resetCamera, goFullScreen, loadMaterial
+}
