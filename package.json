@@ -20,7 +20,6 @@
     "character",
     "props"
   ],
-  "author": "Frank Rousseau <gelnior@free.fr> (https://blog.addictedtointer.net/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cgwire/js-3d-model-viewer/issues"
