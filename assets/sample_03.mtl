@@ -1,0 +1,18 @@
+# Blender MTL File: 'tigre_sumatra_sketchfab.blend'
+# Material Count: 2
+
+newmtl Dos
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.831584 0.426519 0.274447
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Ventre
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.815584 0.793765 0.731584
+Ni 1.000000
+d 1.000000
+illum 2
