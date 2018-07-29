@@ -143,9 +143,6 @@ const loadObject = (scene, url, materialUrl, callback) => {
     const mtlLoader = new MTLLoader()
     mtlLoader.load(materialUrl, (materials) => {
       materials.preload()
-      console.log(materials)
-      // materials.materials.default.map.magFilter = THREE.NearestFilter
-      // materials.materials.default.map.minFilter = THREE.LinearFilter
       objLoader.setMaterials(materials)
       loadObj()
     })
@@ -182,7 +179,11 @@ const goFullScreen = (element) => {
   const hasMozFullScreen = 'mozCancelFullScreen' in document
 
   if (hasWebkitFullScreen) {
-    return element.webkitRequestFullScreen()
+    element.webkitRequestFullScreen()
+    const evt = window.document.createEvent('UIEvents')
+    evt.initUIEvent('resize', true, false, window, 0)
+    window.dispatchEvent(evt)
+    return true
   } else if (hasMozFullScreen) {
     return element.mozRequestFullScreen()
   } else {
@@ -195,9 +196,11 @@ const goFullScreen = (element) => {
  * avoid distortions.
  */
 const onWindowResize = (element, camera, renderer) => () => {
-  const width = element.offsetWidth
-  const height = element.offsetHeight
+  const isFullscreen = !window.screenTop && !window.screenY
+  const width = isFullscreen ? window.innerWidth : element.offsetWidth
+  const height = isFullscreen ? window.innerHeight : element.offsetHeight
   const aspect = width / height
+
   camera.aspect = aspect
   camera.updateProjectionMatrix()
   renderer.setSize(width, height)
