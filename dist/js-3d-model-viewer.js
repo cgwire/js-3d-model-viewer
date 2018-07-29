@@ -49789,11 +49789,13 @@ function LensFlare() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resetCamera = exports.prepareScene = exports.loadObject = exports.goFullScreen = exports.clearScene = void 0;
+exports.goFullScreen = exports.resetCamera = exports.clearScene = exports.loadObject = exports.prepareScene = void 0;
 
 var THREE = _interopRequireWildcard(__webpack_require__(/*! three */ "./node_modules/three/build/three.module.js"));
 
 var _threeObjLoader = _interopRequireDefault(__webpack_require__(/*! three-obj-loader */ "./node_modules/three-obj-loader/dist/index.js"));
+
+var _threeMtlLoader = _interopRequireDefault(__webpack_require__(/*! three-mtl-loader */ "./node_modules/three-mtl-loader/index.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -49801,9 +49803,10 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var OrbitControls = __webpack_require__(/*! three-orbit-controls */ "./node_modules/three-orbit-controls/index.js")(THREE);
 
-var MTLLoader = __webpack_require__(/*! three-mtl-loader */ "./node_modules/three-mtl-loader/index.js");
-
 (0, _threeObjLoader.default)(THREE);
+/*
+ * Default configuration for camera.
+ */
 
 var setCamera = function setCamera(aspect) {
   var camera = new THREE.PerspectiveCamera(45, aspect, 1, 1000);
@@ -49811,27 +49814,39 @@ var setCamera = function setCamera(aspect) {
   camera.updateProjectionMatrix();
   return camera;
 };
+/*
+ * Add lights to given scene (ambient and spots).
+ */
+
 
 var setLights = function setLights(scene) {
-  var ambient = new THREE.AmbientLight(0xffffff, 0.25);
-  var backLight = new THREE.DirectionalLight(0xffffff, 0.5);
-  var keyLight = new THREE.DirectionalLight(new THREE.Color('#EEEEEE'), 0.5);
-  var fillLight = new THREE.DirectionalLight(new THREE.Color('#EEEEEE'), 0.75);
+  var ambient = new THREE.AmbientLight(0xffffff, 0.15);
+  var backLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  var keyLight = new THREE.DirectionalLight(new THREE.Color('#EEEEEE'), 0.3);
+  var fillLight = new THREE.DirectionalLight(new THREE.Color('#EEEEEE'), 0.2);
   keyLight.position.set(-100, 0, 100);
   fillLight.position.set(100, 0, 100);
   backLight.position.set(100, 0, -100).normalize();
-  ambient.intensity = 0.25;
+  var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+  hemiLight.groundColor.setHSL(0.095, 1, 0.95);
+  hemiLight.position.set(0, 100, 0);
+  scene.add(hemiLight);
   scene.add(ambient);
   scene.add(keyLight);
   scene.add(fillLight);
   scene.add(backLight);
-  return {
+  scene.lights = {
     keyLight: keyLight,
     fillLight: fillLight,
     backLight: backLight,
     ambient: ambient
   };
+  return scene;
 };
+/*
+ * Link an orbit control to given camera and renderer.
+ */
+
 
 var setControls = function setControls(camera, renderer) {
   var controls = new OrbitControls(camera, renderer.domElement);
@@ -49839,6 +49854,10 @@ var setControls = function setControls(camera, renderer) {
   camera.controls = controls;
   return controls;
 };
+/*
+ * Configure Three renderer.
+ */
+
 
 var setRenderer = function setRenderer(width, height) {
   var renderer = new THREE.WebGLRenderer();
@@ -49847,6 +49866,10 @@ var setRenderer = function setRenderer(width, height) {
   renderer.setClearColor(new THREE.Color('hsl(0, 0%, 10%)'));
   return renderer;
 };
+/*
+ * Render function required by Three.js to display things.
+ */
+
 
 var render = function render(element, renderer, scene, camera) {
   element.appendChild(renderer.domElement);
@@ -49859,6 +49882,11 @@ var render = function render(element, renderer, scene, camera) {
   animate();
   return scene;
 };
+/*
+ * Build the scene in which the object will be displayed. It configures Three
+ * properly and adds camera, lights and controls.
+ */
+
 
 var prepareScene = function prepareScene(domElement) {
   var scene = new THREE.Scene();
@@ -49874,44 +49902,43 @@ var prepareScene = function prepareScene(domElement) {
   scene.camera = camera;
   return scene;
 };
+/*
+ * Load a mesh (.obj) into the given scene. Materials can be specified too
+ * (.mtl).
+ */
+
 
 exports.prepareScene = prepareScene;
 
-var loadObject = function loadObject(scene, url, mtlUrl, callback) {
+var loadObject = function loadObject(scene, url, materialUrl, callback) {
   if (scene.locked) return false;
-  scene.locked = true;
   var objLoader = new THREE.OBJLoader();
-  var phongMaterial = new THREE.MeshPhongMaterial({
+  var material = new THREE.MeshPhongMaterial({
     color: 0xbbbbcc
   });
 
   var loadObj = function loadObj() {
+    scene.locked = true;
     objLoader.load(url, function (obj) {
-      scene.add(obj);
-      fitCameraToObject(scene.camera, obj);
-
-      if (!mtlUrl) {
+      if (!materialUrl) {
         obj.traverse(function (child) {
           if (child instanceof THREE.Mesh) {
-            child.material = phongMaterial;
+            child.material = material;
           }
         });
       }
 
+      scene.add(obj);
+      fitCameraToObject(scene.camera, obj, scene.lights);
       scene.locked = false;
       if (callback) callback(obj);
     });
   };
 
-  console.log(mtlUrl);
-
-  if (mtlUrl) {
-    var mtlLoader = new MTLLoader();
-    console.log('ok');
-    mtlLoader.load(url, function (materials) {
-      console.log(materials);
+  if (materialUrl) {
+    var mtlLoader = new _threeMtlLoader.default();
+    mtlLoader.load(materialUrl, function (materials) {
       materials.preload();
-      console.log('ok 2');
       objLoader.setMaterials(materials);
       loadObj();
     });
@@ -49921,6 +49948,10 @@ var loadObject = function loadObject(scene, url, mtlUrl, callback) {
 
   return objLoader;
 };
+/*
+ * Remove all meshes from the scene.
+ */
+
 
 exports.loadObject = loadObject;
 
@@ -49931,12 +49962,20 @@ var clearScene = function clearScene(scene) {
     }
   });
 };
+/*
+ * Put back camera in its original position.
+ */
+
 
 exports.clearScene = clearScene;
 
 var resetCamera = function resetCamera(scene) {
   scene.camera.controls.reset();
 };
+/*
+ * Display the viewer through the fullscreen feature of the browser.
+ */
+
 
 exports.resetCamera = resetCamera;
 
@@ -49945,36 +49984,56 @@ var goFullScreen = function goFullScreen(element) {
   var hasMozFullScreen = 'mozCancelFullScreen' in document;
 
   if (hasWebkitFullScreen) {
-    return element.webkitRequestFullScreen();
+    element.webkitRequestFullScreen();
+    var evt = window.document.createEvent('UIEvents');
+    evt.initUIEvent('resize', true, false, window, 0);
+    window.dispatchEvent(evt);
+    return true;
   } else if (hasMozFullScreen) {
     return element.mozRequestFullScreen();
   } else {
     return false;
   }
 };
+/*
+ * When the window is resized, the camera aspect ratio needs to be updated to
+ * avoid distortions.
+ */
+
 
 exports.goFullScreen = goFullScreen;
 
 var onWindowResize = function onWindowResize(element, camera, renderer) {
   return function () {
-    var width = element.offsetWidth;
-    var height = element.offsetHeight;
+    var isFullscreen = !window.screenTop && !window.screenY;
+    var width = isFullscreen ? window.innerWidth : element.offsetWidth;
+    var height = isFullscreen ? window.innerHeight : element.offsetHeight;
     var aspect = width / height;
     camera.aspect = aspect;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
   };
 };
+/*
+ * Depending on the object size, the camera Z position must be bigger or
+ * smaller to make sure the object fill all the space without getting outside
+ * camera point of view.
+ */
 
-var fitCameraToObject = function fitCameraToObject(camera, object) {
+
+var fitCameraToObject = function fitCameraToObject(camera, object, lights) {
   var fov = camera.fov;
   var boundingBox = new THREE.Box3();
   var size = new THREE.Vector3();
   boundingBox.setFromObject(object);
   boundingBox.getSize(size);
   var cameraZ = Math.abs(size.y / 2 * Math.tan(fov * 2));
-  camera.position.z = Math.max(cameraZ, size.z) * 1.5;
+  var z = Math.max(cameraZ, size.z) * 1.5;
+  camera.position.z = z;
   camera.updateProjectionMatrix();
+  lights.keyLight.position.set(-z, 0, z);
+  lights.fillLight.position.set(z, 0, z);
+  lights.backLight.position.set(z, 0, -z);
 };
 
 /***/ })
