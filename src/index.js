@@ -39,10 +39,10 @@ const setLights = (scene) => {
   backLight.position.set(100, 0, -100).normalize()
 
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6)
-  hemiLight.color.setHSL(0.6, 1, 0.8)
   hemiLight.groundColor.setHSL(0.095, 1, 0.95)
   hemiLight.position.set(0, 100, 0)
   scene.add(hemiLight)
+
   scene.add(ambient)
   scene.add(keyLight)
   scene.add(fillLight)
