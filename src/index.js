@@ -1,8 +1,12 @@
 import * as THREE from 'three'
 import OBJLoader from 'three-obj-loader'
+import MTLLoader from 'three-mtl-loader'
 const OrbitControls = require('three-orbit-controls')(THREE)
 OBJLoader(THREE)
 
+/*
+ * Default configuration for camera.
+ */
 const setCamera = (aspect) => {
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -15,30 +19,42 @@ const setCamera = (aspect) => {
   return camera
 }
 
+/*
+ * Add lights to given scene (ambient and spots).
+ */
 const setLights = (scene) => {
-  const ambient = new THREE.AmbientLight(0xffffff, 0.25)
-  const backLight = new THREE.DirectionalLight(0xffffff, 0.5)
+  const ambient = new THREE.AmbientLight(0xffffff, 0.15)
+  const backLight = new THREE.DirectionalLight(0xffffff, 0.3)
   const keyLight = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.5
+    0.3
   )
   const fillLight = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.75
+    0.2
   )
 
   keyLight.position.set(-100, 0, 100)
   fillLight.position.set(100, 0, 100)
   backLight.position.set(100, 0, -100).normalize()
-  ambient.intensity = 0.25
 
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6)
+  hemiLight.color.setHSL(0.6, 1, 0.8)
+  hemiLight.groundColor.setHSL(0.095, 1, 0.95)
+  hemiLight.position.set(0, 100, 0)
+  scene.add(hemiLight)
   scene.add(ambient)
   scene.add(keyLight)
   scene.add(fillLight)
   scene.add(backLight)
-  return { keyLight, fillLight, backLight, ambient }
+
+  scene.lights = { keyLight, fillLight, backLight, ambient }
+  return scene
 }
 
+/*
+ * Link an orbit control to given camera and renderer.
+ */
 const setControls = (camera, renderer) => {
   const controls = new OrbitControls(
     camera,
@@ -49,6 +65,9 @@ const setControls = (camera, renderer) => {
   return controls
 }
 
+/*
+ * Configure Three renderer.
+ */
 const setRenderer = (width, height) => {
   const renderer = new THREE.WebGLRenderer()
   renderer.setSize(width, height)
@@ -57,6 +76,9 @@ const setRenderer = (width, height) => {
   return renderer
 }
 
+/*
+ * Render function required by Three.js to display things.
+ */
 const render = (element, renderer, scene, camera) => {
   element.appendChild(renderer.domElement)
   const animate = () => {
@@ -67,6 +89,10 @@ const render = (element, renderer, scene, camera) => {
   return scene
 }
 
+/*
+ * Build the scene in which the object will be displayed. It configures Three
+ * properly and adds camera, lights and controls.
+ */
 const prepareScene = (domElement) => {
   const scene = new THREE.Scene()
   const element = domElement
@@ -87,25 +113,52 @@ const prepareScene = (domElement) => {
   return scene
 }
 
-const loadObject = (scene, url, callback) => {
+/*
+ * Load a mesh (.obj) into the given scene. Materials can be specified too
+ * (.mtl).
+ */
+const loadObject = (scene, url, materialUrl, callback) => {
   if (scene.locked) return false
   const objLoader = new THREE.OBJLoader()
   const material = new THREE.MeshPhongMaterial({ color: 0xbbbbcc })
-  scene.locked = true
-  objLoader.load(url, (obj) => {
-    obj.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.material = material
+
+  const loadObj = () => {
+    scene.locked = true
+    objLoader.load(url, (obj) => {
+      if (!materialUrl) {
+        obj.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.material = material
+          }
+        })
       }
+      scene.add(obj)
+      fitCameraToObject(scene.camera, obj, scene.lights)
+      scene.locked = false
+      if (callback) callback(obj)
     })
-    scene.add(obj)
-    fitCameraToObject(scene.camera, obj)
-    scene.locked = false
-    if (callback) callback(obj)
-  })
+  }
+
+  if (materialUrl) {
+    const mtlLoader = new MTLLoader()
+    mtlLoader.load(materialUrl, (materials) => {
+      materials.preload()
+      console.log(materials)
+      // materials.materials.default.map.magFilter = THREE.NearestFilter
+      // materials.materials.default.map.minFilter = THREE.LinearFilter
+      objLoader.setMaterials(materials)
+      loadObj()
+    })
+  } else {
+    loadObj()
+  }
+
   return objLoader
 }
 
+/*
+ * Remove all meshes from the scene.
+ */
 const clearScene = (scene) => {
   scene.children.forEach((obj) => {
     if (obj.type === 'Group') {
@@ -114,10 +167,16 @@ const clearScene = (scene) => {
   })
 }
 
+/*
+ * Put back camera in its original position.
+ */
 const resetCamera = (scene) => {
   scene.camera.controls.reset()
 }
 
+/*
+ * Display the viewer through the fullscreen feature of the browser.
+ */
 const goFullScreen = (element) => {
   const hasWebkitFullScreen = 'webkitCancelFullScreen' in document
   const hasMozFullScreen = 'mozCancelFullScreen' in document
@@ -131,6 +190,10 @@ const goFullScreen = (element) => {
   }
 }
 
+/*
+ * When the window is resized, the camera aspect ratio needs to be updated to
+ * avoid distortions.
+ */
 const onWindowResize = (element, camera, renderer) => () => {
   const width = element.offsetWidth
   const height = element.offsetHeight
@@ -140,7 +203,12 @@ const onWindowResize = (element, camera, renderer) => () => {
   renderer.setSize(width, height)
 }
 
-const fitCameraToObject = (camera, object) => {
+/*
+ * Depending on the object size, the camera Z position must be bigger or
+ * smaller to make sure the object fill all the space without getting outside
+ * camera point of view.
+ */
+const fitCameraToObject = (camera, object, lights) => {
   const fov = camera.fov
   const boundingBox = new THREE.Box3()
   const size = new THREE.Vector3()
@@ -148,8 +216,13 @@ const fitCameraToObject = (camera, object) => {
   boundingBox.getSize(size)
 
   let cameraZ = Math.abs(size.y / 2 * Math.tan(fov * 2))
-  camera.position.z = Math.max(cameraZ, size.z) * 1.5
+  const z = Math.max(cameraZ, size.z) * 1.5
+  camera.position.z = z
   camera.updateProjectionMatrix()
+
+  lights.keyLight.position.set(-z, 0, z)
+  lights.fillLight.position.set(z, 0, z)
+  lights.backLight.position.set(z, 0, -z)
 }
 
 export {
