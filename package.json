@@ -28,6 +28,7 @@
   "homepage": "https://github.com/cgwire/js-3d-model-viewer#readme",
   "dependencies": {
     "three": "0.94.0",
+    "three-mtl-loader": "^1.0.2",
     "three-obj-loader": "1.1.3",
     "three-orbit-controls": "82.1.0"
   },
