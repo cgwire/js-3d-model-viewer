@@ -3,8 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title>Javascript 3D Model Viewer</title>
-  </head>
-  <body>
     <style>
       body {
         margin: 0;
@@ -48,16 +46,29 @@
         margin: auto;
         margin-top: 4em;
         font-size: 1.2em;
-			}
+      }
+      .footer {
+        padding-bottom: 2em;
+      }
 	</style>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.min.css">
-  <link href="https://raw.githubusercontent.com/PrismJS/prism-themes/master/themes/prism-hopscotch.css" rel="stylesheet" />
+  <link 
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://raw.githubusercontent.com/PrismJS/prism-themes/master/themes/prism-hopscotch.css"
+  />
 </head>
+
 <body>
   <div class="content">
+
+    <header class="center"><h1>Javascript 3D Model Viewer</h1></header>
+
     <div id="viewer" style="">
     </div>
+
     <div class="center">
       <button class="button" id="sample-1-button">
         Sample 1
@@ -69,13 +80,15 @@
         Sample 3
       </button>
     </div>
+
     <div class="center">
       <button class="button" id="fullscreen-button">
         Go Full Screen
       </button>
     </div>
+
     <div style="margin: 2em auto; max-width: 900px">
-    <pre><code class="language-javascript">var modelPlayer = this['js-3d-model-viewer'];
+      <pre><code class="language-javascript">var modelPlayer = this['js-3d-model-viewer'];
 var viewerElement = document.getElementById('viewer')
 var scene = modelPlayer.prepareScene(viewerElement)
 modelPlayer.loadObject(scene, './assets/sample.obj')
@@ -85,43 +98,57 @@ fullScreenButton.addEventListener('click', function () {
   modelPlayer.goFullScreen(viewerElement)
 })</code></pre>
     </div>
-    <div class="center">
+
+    <footer class="center footer">
       <a href="https://github.com/cgwire/js-3d-model-viewer">
         See sources on Github
       </a>
-    </div>
+    </footer>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.js"></script>
   <script src="./dist/js-3d-model-viewer.js"></script>
   <script>
   var modelPlayer = this['js-3d-model-viewer'];
   var viewerElement = document.getElementById('viewer')
   var scene = modelPlayer.prepareScene(viewerElement)
-  modelPlayer.loadObject(scene, './assets/sample_02.obj')
+  modelPlayer.loadObject(scene, './assets/sample.obj')
 
   var fullScreenButton = document.getElementById('fullscreen-button')
   fullScreenButton.addEventListener('click', function () {
     modelPlayer.goFullScreen(viewerElement)
   })
+
   var sample1Button = document.getElementById('sample-1-button')
   sample1Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.loadObject(scene, 'https://cgwire.github.io/js-3d-model-viewer//assets/sample.obj')
+    modelPlayer.loadObject(scene, './assets/sample.obj')
   })
+
   var sample2Button = document.getElementById('sample-2-button')
   sample2Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.loadObject(scene, 'https://cgwire.github.io/js-3d-model-viewer//assets/sample_02.obj')
+    modelPlayer.loadObject(
+        scene, 
+        './assets/sample_02.obj', 
+        './assets/sample_02.mtl'
+    )
   })
+
   var sample3Button = document.getElementById('sample-3-button')
   sample3Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.loadObject(scene, 'https://cgwire.github.io/js-3d-model-viewer//assets/sample_03.obj')
+    modelPlayer.loadObject(
+      scene, 
+      './assets/sample_03.obj',
+      './assets/sample_03.mtl'
+    )
   })
   </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.js"></script>
 </body>
+</html>
