@@ -4,6 +4,12 @@ import MTLLoader from 'three-mtl-loader'
 const OrbitControls = require('three-orbit-controls')(THREE)
 OBJLoader(THREE)
 
+const emitEvent = (element, eventName, data) => {
+  element.dispatchEvent(new window.CustomEvent(eventName, {
+    detail: data
+  }))
+}
+
 /*
  * Default configuration for camera.
  */
@@ -110,6 +116,7 @@ const prepareScene = (domElement) => {
     false
   )
   scene.camera = camera
+  scene.element = domElement
   return scene
 }
 
@@ -118,39 +125,62 @@ const prepareScene = (domElement) => {
  * (.mtl).
  */
 const loadObject = (scene, url, materialUrl, callback) => {
-  if (scene.locked) return false
   const objLoader = new THREE.OBJLoader()
-  const material = new THREE.MeshPhongMaterial({ color: 0xbbbbcc })
-
-  const loadObj = () => {
-    scene.locked = true
-    objLoader.load(url, (obj) => {
-      if (!materialUrl) {
-        obj.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            child.material = material
-          }
-        })
-      }
-      scene.add(obj)
-      fitCameraToObject(scene.camera, obj, scene.lights)
-      scene.locked = false
-      if (callback) callback(obj)
-    })
-  }
+  if (scene.locked) return false
+  scene.locked = true
 
   if (materialUrl) {
     const mtlLoader = new MTLLoader()
     mtlLoader.load(materialUrl, (materials) => {
       materials.preload()
       objLoader.setMaterials(materials)
-      loadObj()
+      loadObj(objLoader, scene, url, callback)
     })
   } else {
-    loadObj()
+    loadObj(objLoader, scene, url, callback)
   }
 
   return objLoader
+}
+
+/*
+ * Load an .obj file. If no materials is configured on the loader, it sets
+ * a phong grey material by default.
+ */
+const loadObj = (objLoader, scene, url, callback) => {
+  const material = new THREE.MeshPhongMaterial({ color: 0xbbbbcc })
+
+  objLoader.load(url, (obj) => {
+    if (!objLoader.materials) {
+      obj.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.material = material
+        }
+      })
+    }
+    scene.add(obj)
+    fitCameraToObject(scene.camera, obj, scene.lights)
+    scene.locked = false
+    if (callback) callback(obj)
+    emitEvent(scene.element, 'loaded', {obj})
+  },
+  (xhr) => {
+    if (xhr.total === 0) {
+      emitEvent(scene.element, 'loading', {
+        loaded: 0,
+        total: 100
+      })
+    } else {
+      emitEvent(scene.element, 'loading', {
+        loaded: xhr.loaded,
+        total: xhr.total
+      })
+    }
+  },
+  (err) => {
+    emitEvent(scene.element, 'error', {err})
+    if (callback) callback(err)
+  })
 }
 
 /*

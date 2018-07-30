@@ -51,22 +51,23 @@
         padding-bottom: 2em;
       }
 	</style>
-  <link 
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.min.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://raw.githubusercontent.com/PrismJS/prism-themes/master/themes/prism-hopscotch.css"
-  />
-</head>
+    <link 
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.min.css"
+    />
+  </head>
 
-<body>
+  <body>
   <div class="content">
 
     <header class="center"><h1>Javascript 3D Model Viewer</h1></header>
 
     <div id="viewer" style="">
+    </div>
+
+    <div class="center">
+      <span id="name">Sample 01</span>
+      <span id="loading"></span>
     </div>
 
     <div class="center">
@@ -108,10 +109,24 @@ fullScreenButton.addEventListener('click', function () {
 
   <script src="./dist/js-3d-model-viewer.js"></script>
   <script>
-  var modelPlayer = this['js-3d-model-viewer'];
+  var modelPlayer = this['js-3d-model-viewer']
+  var nameElement = document.getElementById('name')
+  var loadingElement = document.getElementById('loading')
   var viewerElement = document.getElementById('viewer')
   var scene = modelPlayer.prepareScene(viewerElement)
-  modelPlayer.loadObject(scene, './assets/sample.obj')
+
+  viewerElement.addEventListener('loading', function (event) {
+    if (event.detail.loaded === 0) {
+      nameElement.innerHTML = 'Loading...'
+    } 
+    var progress = Math.floor(100 * event.detail.loaded / event.detail.total)
+    loadingElement.innerHTML = progress + '%'
+  })
+
+  modelPlayer.loadObject(scene, './assets/sample.obj', null, function () {
+    nameElement.innerHTML = 'Sample 01'
+    loadingElement.innerHTML = ''
+  })
 
   var fullScreenButton = document.getElementById('fullscreen-button')
   fullScreenButton.addEventListener('click', function () {
@@ -122,7 +137,10 @@ fullScreenButton.addEventListener('click', function () {
   sample1Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.loadObject(scene, './assets/sample.obj')
+    modelPlayer.loadObject(scene, './assets/sample.obj', null, function () {
+      nameElement.innerHTML = 'Sample 01'
+      loadingElement.innerHTML = ''
+    })
   })
 
   var sample2Button = document.getElementById('sample-2-button')
@@ -130,10 +148,13 @@ fullScreenButton.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
     modelPlayer.loadObject(
-        scene, 
-        './assets/sample_02.obj', 
-        './assets/sample_02.mtl'
-    )
+      scene, 
+      './assets/sample_02.obj', 
+      './assets/sample_02.mtl',
+      function () {
+        nameElement.innerHTML = 'Sample 02'
+        loadingElement.innerHTML = ''
+    })
   })
 
   var sample3Button = document.getElementById('sample-3-button')
@@ -143,8 +164,11 @@ fullScreenButton.addEventListener('click', function () {
     modelPlayer.loadObject(
       scene, 
       './assets/sample_03.obj',
-      './assets/sample_03.mtl'
-    )
+      './assets/sample_03.mtl',
+      function () {
+        nameElement.innerHTML = 'Sample 03'
+        loadingElement.innerHTML = ''
+    })
   })
   </script>
 
