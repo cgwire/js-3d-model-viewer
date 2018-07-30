@@ -246,6 +246,7 @@ const fitCameraToObject = (camera, object, lights) => {
   const boundingBox = new THREE.Box3()
   const size = new THREE.Vector3()
   boundingBox.setFromObject(object)
+  resetObjectPosition(boundingBox, object)
   boundingBox.getSize(size)
 
   let cameraZ = Math.abs(size.y / 2 * Math.tan(fov * 2))
@@ -256,6 +257,19 @@ const fitCameraToObject = (camera, object, lights) => {
   lights.keyLight.position.set(-z, 0, z)
   lights.fillLight.position.set(z, 0, z)
   lights.backLight.position.set(z, 0, -z)
+}
+
+/*
+ * Put object to the center.
+ */
+const resetObjectPosition = (boundingBox, object) => {
+  const size = new THREE.Vector3()
+  boundingBox.setFromObject(object)
+  boundingBox.getSize(size)
+  object.position.x = -boundingBox.min.x - size.x / 2
+  object.position.y = -boundingBox.min.y - size.y / 2
+  object.position.z = -boundingBox.min.z - size.z / 2
+  object.rotation.z = 0
 }
 
 export {
