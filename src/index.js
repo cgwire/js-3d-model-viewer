@@ -17,7 +17,7 @@ const setCamera = (aspect) => {
   const camera = new THREE.PerspectiveCamera(
     45,
     aspect,
-    1,
+    0.01,
     1000
   )
   camera.position.z = 5
@@ -260,7 +260,7 @@ const fitCameraToObject = (camera, object, lights) => {
 }
 
 /*
- * Put object to the center.
+ * Move object to the center.
  */
 const resetObjectPosition = (boundingBox, object) => {
   const size = new THREE.Vector3()
