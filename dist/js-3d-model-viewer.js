@@ -49804,12 +49804,19 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 var OrbitControls = __webpack_require__(/*! three-orbit-controls */ "./node_modules/three-orbit-controls/index.js")(THREE);
 
 (0, _threeObjLoader.default)(THREE);
+
+var emitEvent = function emitEvent(element, eventName, data) {
+  element.dispatchEvent(new window.CustomEvent(eventName, {
+    detail: data
+  }));
+};
 /*
  * Default configuration for camera.
  */
 
+
 var setCamera = function setCamera(aspect) {
-  var camera = new THREE.PerspectiveCamera(45, aspect, 1, 1000);
+  var camera = new THREE.PerspectiveCamera(45, aspect, 0.01, 1000);
   camera.position.z = 5;
   camera.updateProjectionMatrix();
   return camera;
@@ -49900,6 +49907,7 @@ var prepareScene = function prepareScene(domElement) {
   render(element, renderer, scene, camera);
   window.addEventListener('resize', onWindowResize(element, camera, renderer), false);
   scene.camera = camera;
+  scene.element = domElement;
   return scene;
 };
 /*
@@ -49911,49 +49919,74 @@ var prepareScene = function prepareScene(domElement) {
 exports.prepareScene = prepareScene;
 
 var loadObject = function loadObject(scene, url, materialUrl, callback) {
-  if (scene.locked) return false;
   var objLoader = new THREE.OBJLoader();
-  var material = new THREE.MeshPhongMaterial({
-    color: 0xbbbbcc
-  });
-
-  var loadObj = function loadObj() {
-    scene.locked = true;
-    objLoader.load(url, function (obj) {
-      if (!materialUrl) {
-        obj.traverse(function (child) {
-          if (child instanceof THREE.Mesh) {
-            child.material = material;
-          }
-        });
-      }
-
-      scene.add(obj);
-      fitCameraToObject(scene.camera, obj, scene.lights);
-      scene.locked = false;
-      if (callback) callback(obj);
-    });
-  };
+  if (scene.locked) return false;
+  scene.locked = true;
 
   if (materialUrl) {
     var mtlLoader = new _threeMtlLoader.default();
     mtlLoader.load(materialUrl, function (materials) {
       materials.preload();
       objLoader.setMaterials(materials);
-      loadObj();
+      loadObj(objLoader, scene, url, callback);
     });
   } else {
-    loadObj();
+    loadObj(objLoader, scene, url, callback);
   }
 
   return objLoader;
 };
 /*
- * Remove all meshes from the scene.
+ * Load an .obj file. If no materials is configured on the loader, it sets
+ * a phong grey material by default.
  */
 
 
 exports.loadObject = loadObject;
+
+var loadObj = function loadObj(objLoader, scene, url, callback) {
+  var material = new THREE.MeshPhongMaterial({
+    color: 0xbbbbcc
+  });
+  objLoader.load(url, function (obj) {
+    if (!objLoader.materials) {
+      obj.traverse(function (child) {
+        if (child instanceof THREE.Mesh) {
+          child.material = material;
+        }
+      });
+    }
+
+    scene.add(obj);
+    fitCameraToObject(scene.camera, obj, scene.lights);
+    scene.locked = false;
+    if (callback) callback(obj);
+    emitEvent(scene.element, 'loaded', {
+      obj: obj
+    });
+  }, function (xhr) {
+    if (xhr.total === 0) {
+      emitEvent(scene.element, 'loading', {
+        loaded: 0,
+        total: 100
+      });
+    } else {
+      emitEvent(scene.element, 'loading', {
+        loaded: xhr.loaded,
+        total: xhr.total
+      });
+    }
+  }, function (err) {
+    emitEvent(scene.element, 'error', {
+      err: err
+    });
+    if (callback) callback(err);
+  });
+};
+/*
+ * Remove all meshes from the scene.
+ */
+
 
 var clearScene = function clearScene(scene) {
   scene.children.forEach(function (obj) {
@@ -50026,6 +50059,7 @@ var fitCameraToObject = function fitCameraToObject(camera, object, lights) {
   var boundingBox = new THREE.Box3();
   var size = new THREE.Vector3();
   boundingBox.setFromObject(object);
+  resetObjectPosition(boundingBox, object);
   boundingBox.getSize(size);
   var cameraZ = Math.abs(size.y / 2 * Math.tan(fov * 2));
   var z = Math.max(cameraZ, size.z) * 1.5;
@@ -50034,6 +50068,20 @@ var fitCameraToObject = function fitCameraToObject(camera, object, lights) {
   lights.keyLight.position.set(-z, 0, z);
   lights.fillLight.position.set(z, 0, z);
   lights.backLight.position.set(z, 0, -z);
+};
+/*
+ * Move object to the center.
+ */
+
+
+var resetObjectPosition = function resetObjectPosition(boundingBox, object) {
+  var size = new THREE.Vector3();
+  boundingBox.setFromObject(object);
+  boundingBox.getSize(size);
+  object.position.x = -boundingBox.min.x - size.x / 2;
+  object.position.y = -boundingBox.min.y - size.y / 2;
+  object.position.z = -boundingBox.min.z - size.z / 2;
+  object.rotation.z = 0;
 };
 
 /***/ })
