@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Javascript 3D Model Viewer Tests</title>
+     <link 
+       href="./mocha.css"
+       rel="stylesheet" 
+     />
+  </head>
+
+  <body>
+  <div class="content">
+    <header class="center"></header>
+
+    <div id="mocha"></div>
+    <div id="viewer"></div>
+
+    <script src="./mocha.js"></script>
+    <script src="../dist/js-3d-model-viewer.js"></script>
+    <script type="module" src="setup.js"></script>
+    <script type="module" src="run.js"></script>
+    <script>
+      mocha.checkLeaks();
+      mocha.run();
+    </script>
+  </div>
+  </body>
+</html>
