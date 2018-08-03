@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import OBJLoader from 'three-obj-loader'
 import MTLLoader from 'three-mtl-loader'
 const OrbitControls = require('three-orbit-controls')(THREE)
-OBJLoader(THREE)
+// eslint-disable-next-line
+const OBJLoader = require('three-obj-loader')(THREE)
 
 const emitEvent = (element, eventName, data) => {
   element.dispatchEvent(new window.CustomEvent(eventName, {

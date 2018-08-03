@@ -49793,17 +49793,16 @@ exports.goFullScreen = exports.resetCamera = exports.clearScene = exports.loadOb
 
 var THREE = _interopRequireWildcard(__webpack_require__(/*! three */ "./node_modules/three/build/three.module.js"));
 
-var _threeObjLoader = _interopRequireDefault(__webpack_require__(/*! three-obj-loader */ "./node_modules/three-obj-loader/dist/index.js"));
-
 var _threeMtlLoader = _interopRequireDefault(__webpack_require__(/*! three-mtl-loader */ "./node_modules/three-mtl-loader/index.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-var OrbitControls = __webpack_require__(/*! three-orbit-controls */ "./node_modules/three-orbit-controls/index.js")(THREE);
+var OrbitControls = __webpack_require__(/*! three-orbit-controls */ "./node_modules/three-orbit-controls/index.js")(THREE); // eslint-disable-next-line
 
-(0, _threeObjLoader.default)(THREE);
+
+var OBJLoader = __webpack_require__(/*! three-obj-loader */ "./node_modules/three-obj-loader/dist/index.js")(THREE);
 
 var emitEvent = function emitEvent(element, eventName, data) {
   element.dispatchEvent(new window.CustomEvent(eventName, {
