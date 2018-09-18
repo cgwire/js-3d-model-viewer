@@ -1,8 +1,7 @@
 import * as THREE from 'three'
-import MTLLoader from 'three-mtl-loader'
 const OrbitControls = require('three-orbit-controls')(THREE)
-// eslint-disable-next-line
-const OBJLoader = require('three-obj-loader')(THREE)
+import {MTLLoader, OBJLoader} from 'three-obj-mtl-loader'
+
 
 const emitEvent = (element, eventName, data) => {
   element.dispatchEvent(new window.CustomEvent(eventName, {
@@ -125,7 +124,7 @@ const prepareScene = (domElement) => {
  * (.mtl).
  */
 const loadObject = (scene, url, materialUrl, callback) => {
-  const objLoader = new THREE.OBJLoader()
+  const objLoader = new OBJLoader()
   if (scene.locked) return false
   scene.locked = true
 
