@@ -1,7 +1,6 @@
 import * as THREE from 'three'
-const OrbitControls = require('three-orbit-controls')(THREE)
 import {MTLLoader, OBJLoader} from 'three-obj-mtl-loader'
-
+const OrbitControls = require('three-orbit-controls')(THREE)
 
 const emitEvent = (element, eventName, data) => {
   element.dispatchEvent(new window.CustomEvent(eventName, {
