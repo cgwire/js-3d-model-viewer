@@ -225,14 +225,17 @@ const goFullScreen = (element) => {
  * avoid distortions.
  */
 const onWindowResize = (element, camera, renderer) => () => {
-  const isFullscreen = !window.screenTop && !window.screenY
-  const width = isFullscreen ? window.innerWidth : element.offsetWidth
-  const height = isFullscreen ? window.innerHeight : element.offsetHeight
-  const aspect = width / height
-
-  camera.aspect = aspect
-  camera.updateProjectionMatrix()
-  renderer.setSize(width, height)
+  const resize = () => {
+    const isFullscreen = !window.screenTop && !window.screenY
+    const width = isFullscreen ? window.innerWidth : element.offsetWidth
+    const height = isFullscreen ? window.innerHeight : element.offsetHeight
+    const aspect = width / height
+    camera.aspect = aspect
+    camera.updateProjectionMatrix()
+    renderer.setSize(width, height)
+  }
+  resize()
+  setTimeout(resize, 100)
 }
 
 /*
