@@ -73,7 +73,7 @@ const setControls = (camera, renderer) => {
  * Configure Three renderer.
  */
 const setRenderer = (width, height) => {
-  const renderer = new THREE.WebGLRenderer()
+  const renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(width, height)
   renderer.setPixelRatio(window.devicePixelRatio)
   renderer.setClearColor(new THREE.Color('hsl(0, 0%, 10%)'))
@@ -156,6 +156,7 @@ const loadObj = (objLoader, scene, url, callback) => {
         }
       })
     }
+    mesh.geometry.computeVertexNormals()
     scene.add(obj)
     fitCameraToObject(scene.camera, obj, scene.lights)
     scene.locked = false
