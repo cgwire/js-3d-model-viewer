@@ -149,14 +149,17 @@ const loadObj = (objLoader, scene, url, callback) => {
   const material = new THREE.MeshPhongMaterial({ color: 0xbbbbcc })
 
   objLoader.load(url, (obj) => {
+    obj.geometry.computeVertexNormals()
+    obj.geometry.mergeVertices()
     if (!objLoader.materials) {
       obj.traverse((child) => {
+        child.geometry.computeVertexNormals()
+        child.geometry.mergeVertices()
         if (child instanceof THREE.Mesh) {
           child.material = material
         }
       })
     }
-    obj.geometry.computeVertexNormals()
     scene.add(obj)
     fitCameraToObject(scene.camera, obj, scene.lights)
     scene.locked = false
