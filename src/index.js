@@ -160,6 +160,7 @@ const loadObj = (objLoader, scene, url, callback) => {
         }
       })
     }
+    mesh.geometry.computeVertexNormals()
     scene.add(obj)
     fitCameraToObject(scene.camera, obj, scene.lights)
     scene.locked = false
