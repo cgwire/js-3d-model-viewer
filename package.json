@@ -4,6 +4,7 @@
   "version": "0.1.5",
   "description": "An easy to use viewer to display 3D models in the browser.",
   "main": "src/index.js",
+  "typings": "index.d.ts",
   "scripts": {
     "dev": "webpack",
     "build": "NODE_ENV=production webpack",
