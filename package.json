@@ -1,7 +1,7 @@
 {
   "name": "js-3d-model-viewer",
   "author": "CGWire <contact@cg-wire.com> (http://cg-wire.com)",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "An easy to use viewer to display 3D models in the browser.",
   "main": "src/index.js",
   "typings": "index.d.ts",
