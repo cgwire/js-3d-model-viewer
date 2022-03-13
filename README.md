@@ -56,16 +56,13 @@ This viewer is based on [Three.js](https://threejs.org/)
 
 ## Development environment
 
-All the code is in the `src/index.js` file. Once you did your changes you have
-
 First install dependencies:
 
 ```
 npm i
 ```
 
-
-to run the dev build:
+All the code is in the `src/index.js` file. Once you did your changes you have to run the dev build:
 
 ```
 npm run dev
