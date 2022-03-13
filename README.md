@@ -54,6 +54,41 @@ WebGL and Three.js allow to display easily 3D geometries.
 This viewer is based on [Three.js](https://threejs.org/)
 
 
+## Development environment
+
+All the code is in the `src/index.js` file. Once you did your changes you have
+
+First install dependencies:
+
+```
+npm i
+```
+
+
+to run the dev build:
+
+```
+npm run dev
+```
+
+Then you can test it with the demo page by starting a static websrever :
+
+```
+./node_modules/.bin/static-server
+```
+
+You can see the result in the browser by connecting to
+[http://localhost:9080](http://localhost:9080).
+
+To build the projects for production you have to run the following command:
+
+```
+npm run build
+```
+
+You will obtained a minified version of the sources in the `dist` folder.
+
+
 ## Resources
 
 * Tutorial: https://manu.ninja/webgl-3d-model-viewer-using-three-js/
