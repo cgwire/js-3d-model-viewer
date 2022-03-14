@@ -18,7 +18,11 @@ Then run this snippet after the HTML of your page is loaded:
 ```javascript
 import modelPlayer from 'js-3d-model-viewer'
 const viewerElement = document.getElementById('viewer')
-const scene = modelPlayer.prepareScene(viewerElement)
+const opts = {
+  grid: true,
+  trackball: false
+}
+const scene = modelPlayer.prepareScene(viewerElement, opts)
 modelPlayer.loadObject(scene, './assets/sample.obj') // Urls are fine here.
 ```
 
@@ -34,9 +38,16 @@ fullScreenButton.addEventListener('click', () => {
 })
 ```
 
+If you want enable the underlying Thee.js cache:
+
+```
+modelPlayer.enableCache()
+// modelPlayer.disableCache()
+```
+
 ## Why
  
-CG studios want to be able to perform a quick review of 3D models. Displaying a
+Animation studios want to be able to perform a quick review of 3D models. Displaying a
 model in the browser could help in solving this problem. On a broader aspect,
 there is no open source 3D model viewer. Which is sad whent technologies like
 WebGL and Three.js allow to display easily 3D geometries.
@@ -95,8 +106,8 @@ You will obtained a minified version of the sources in the `dist` folder.
 
 ## About authors
 
-This viewer is written by CG Wire, a company based in France. We help small to
-midsize CG studios to manage their production and build pipeline efficiently.
+This viewer is written by CG Wire, a company based in France. We help
+animations studios to manage their production and build pipeline efficiently.
 
 We apply software craftmanship principles as much as possible. We love coding
 and consider that strong quality and good developer experience matter a lot.
