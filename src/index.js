@@ -1,11 +1,26 @@
 import * as THREE from 'three'
 import {MTLLoader, OBJLoader} from 'three-obj-mtl-loader'
-const OrbitControls = require('three-orbit-controls')(THREE)
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
 
 const emitEvent = (element, eventName, data) => {
   element.dispatchEvent(new window.CustomEvent(eventName, {
     detail: data
   }))
+}
+
+/*
+ * Enable three.js cache.
+ */
+const enableCache = () => {
+  THREE.Cache.enable = true
+}
+
+/*
+ * Disable three.js cache.
+ */
+const disableCache = () => {
+  THREE.Cache.enable = false
 }
 
 /*
@@ -59,11 +74,20 @@ const setLights = (scene) => {
 /*
  * Link an orbit control to given camera and renderer.
  */
-const setControls = (camera, renderer) => {
-  const controls = new OrbitControls(
-    camera,
-    renderer.domElement
-  )
+const setControls = (camera, renderer, isTrackball) => {
+  let controls
+
+  if (isTrackball) {
+    controls = new TrackballControls(
+      camera,
+      renderer.domElement
+    )
+  } else {
+    controls = new OrbitControls(
+      camera,
+      renderer.domElement
+    )
+  }
   controls.enableZoom = true
   camera.controls = controls
   return controls
@@ -83,11 +107,13 @@ const setRenderer = (width, height) => {
 /*
  * Render function required by Three.js to display things.
  */
-const render = (element, renderer, scene, camera) => {
+const render = (element, renderer, scene, camera, isTrackball) => {
   element.appendChild(renderer.domElement)
   const animate = () => {
     window.requestAnimationFrame(animate)
     renderer.render(scene, camera)
+    // trackball controls needs to be updated in the animation loop before it will work
+    if (isTrackball) camera.controls.update()
   }
   animate()
   return scene
@@ -97,7 +123,7 @@ const render = (element, renderer, scene, camera) => {
  * Build the scene in which the object will be displayed. It configures Three
  * properly and adds camera, lights and controls.
  */
-const prepareScene = (domElement) => {
+const prepareScene = (domElement, opts) => {
   const scene = new THREE.Scene()
   const element = domElement
   const width = element.offsetWidth
@@ -105,9 +131,12 @@ const prepareScene = (domElement) => {
 
   const camera = setCamera(width / height)
   const renderer = setRenderer(width, height, scene, camera)
-  setControls(camera, renderer)
+  setControls(camera, renderer, opts.trackball)
   setLights(scene)
-  render(element, renderer, scene, camera)
+  if (opts.grid) {
+    showGrid(scene)
+  }
+  render(element, renderer, scene, camera, opts.trackball)
   window.addEventListener(
     'resize',
     onWindowResize(element, camera, renderer),
@@ -149,18 +178,13 @@ const loadObj = (objLoader, scene, url, callback) => {
   const material = new THREE.MeshPhongMaterial({ color: 0xbbbbcc })
 
   objLoader.load(url, (obj) => {
-    obj.geometry.computeVertexNormals()
-    obj.geometry.mergeVertices()
     if (!objLoader.materials) {
       obj.traverse((child) => {
-        child.geometry.computeVertexNormals()
-        child.geometry.mergeVertices()
         if (child instanceof THREE.Mesh) {
           child.material = material
         }
       })
     }
-    mesh.geometry.computeVertexNormals()
     scene.add(obj)
     fitCameraToObject(scene.camera, obj, scene.lights)
     scene.locked = false
@@ -202,6 +226,25 @@ const clearScene = (scene) => {
  */
 const resetCamera = (scene) => {
   scene.camera.controls.reset()
+}
+
+/*
+ * Put back camera in its original position.
+ */
+const showGrid = (scene) => {
+  if (!scene.grid) {
+    const size = 10
+    const divisions = 10
+    const gridHelper = new THREE.GridHelper(size, divisions)
+    scene.add(gridHelper)
+    scene.grid = gridHelper
+  } else {
+    scene.grid.visible = true
+  }
+}
+
+const hideGrid = (scene) => {
+  scene.grid.visible = false
 }
 
 /*
@@ -279,5 +322,13 @@ const resetObjectPosition = (boundingBox, object) => {
 }
 
 export {
-  prepareScene, loadObject, clearScene, resetCamera, goFullScreen
+  prepareScene,
+  loadObject,
+  clearScene,
+  resetCamera,
+  goFullScreen,
+  showGrid,
+  hideGrid,
+  enableCache,
+  disableCache
 }
