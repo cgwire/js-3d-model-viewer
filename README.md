@@ -38,7 +38,7 @@ fullScreenButton.addEventListener('click', () => {
 })
 ```
 
-If you want enable the underlying Thee.js cache:
+If you want to enable the underlying Thee.js cache:
 
 ```
 modelPlayer.enableCache()
@@ -79,7 +79,7 @@ All the code is in the `src/index.js` file. Once you did your changes you have t
 npm run dev
 ```
 
-Then you can test it with the demo page by starting a static websrever :
+Then you can test it with the demo page by starting a static webserver:
 
 ```
 npm run serve
