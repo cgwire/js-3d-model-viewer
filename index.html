@@ -50,6 +50,9 @@
       .footer {
         padding-bottom: 2em;
       }
+      .mr2 {
+        margin-right: 2em;
+      }
 	</style>
     <link 
       rel="stylesheet"
@@ -83,13 +86,17 @@
     </div>
 
     <div class="center">
+      <input class="mr2" id="grid-button" type="checkbox" checked>
+        Grid
+      </input>
       <button class="button" id="fullscreen-button">
         Go Full Screen
       </button>
     </div>
 
     <div style="margin: 2em auto; max-width: 900px">
-      <pre><code class="language-javascript">var modelPlayer = this['js-3d-model-viewer'];
+      <pre><code class="language-javascript">
+var modelPlayer = this['js-3d-model-viewer'];
 var viewerElement = document.getElementById('viewer')
 var scene = modelPlayer.prepareScene(viewerElement)
 modelPlayer.loadObject(scene, './assets/sample.obj')
@@ -113,7 +120,9 @@ fullScreenButton.addEventListener('click', function () {
   var nameElement = document.getElementById('name')
   var loadingElement = document.getElementById('loading')
   var viewerElement = document.getElementById('viewer')
-  var scene = modelPlayer.prepareScene(viewerElement)
+  var scene = modelPlayer.prepareScene(viewerElement, {
+    grid: true
+  })
 
   viewerElement.addEventListener('loading', function (event) {
     if (event.detail.loaded === 0) {
@@ -137,8 +146,9 @@ fullScreenButton.addEventListener('click', function () {
   sample1Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
+    modelPlayer.showGrid(scene)
+    nameElement.innerHTML = 'Sample 01'
     modelPlayer.loadObject(scene, './assets/sample.obj', null, function () {
-      nameElement.innerHTML = 'Sample 01'
       loadingElement.innerHTML = ''
     })
   })
@@ -147,12 +157,13 @@ fullScreenButton.addEventListener('click', function () {
   sample2Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
+    modelPlayer.showGrid(scene)
+    nameElement.innerHTML = 'Sample 02'
     modelPlayer.loadObject(
       scene, 
       './assets/sample_02.obj', 
       './assets/sample_02.mtl',
       function () {
-        nameElement.innerHTML = 'Sample 02'
         loadingElement.innerHTML = ''
     })
   })
@@ -161,6 +172,8 @@ fullScreenButton.addEventListener('click', function () {
   sample3Button.addEventListener('click', function () {
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
+    modelPlayer.showGrid(scene)
+    nameElement.innerHTML = 'Sample 03'
     modelPlayer.loadObject(
       scene, 
       './assets/sample_03.obj',
@@ -170,6 +183,15 @@ fullScreenButton.addEventListener('click', function () {
         loadingElement.innerHTML = ''
     })
   })
+
+  var gridCheckbox = document.querySelector('#grid-button');
+  gridCheckbox.onchange = function() {
+  if(gridCheckbox.checked) {
+    modelPlayer.showGrid(scene)
+  } else {
+    modelPlayer.hideGrid(scene)
+  }
+};
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.js"></script>
