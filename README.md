@@ -82,7 +82,7 @@ npm run dev
 Then you can test it with the demo page by starting a static websrever :
 
 ```
-./node_modules/.bin/static-server
+npm run serve
 ```
 
 You can see the result in the browser by connecting to
