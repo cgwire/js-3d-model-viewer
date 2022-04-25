@@ -49,7 +49,7 @@ modelPlayer.enableCache()
  
 Animation studios want to be able to perform a quick review of 3D models. Displaying a
 model in the browser could help in solving this problem. On a broader aspect,
-there is no open source 3D model viewer. Which is sad whent technologies like
+there is no open source 3D model viewer. Which is sad when technologies like
 WebGL and Three.js allow to display easily 3D geometries.
 
 
