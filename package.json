@@ -5,7 +5,7 @@
   "version": "0.1.7",
   "description": "An easy to use viewer to display 3D models in the browser.",
   "main": "src/index.js",
-  "typings": "index.d.ts",
+  "typings": "src/index.d.ts",
   "scripts": {
     "serve": "./node_modules/.bin/static-server",
     "build": "NODE_ENV=production rollup -c"
