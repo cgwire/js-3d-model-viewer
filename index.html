@@ -83,6 +83,12 @@
       <button class="button" id="sample-3-button">
         Sample 3
       </button>
+      <button class="button" id="sample-4-button">
+        Sample 4 (.glb)
+      </button>
+      <!--button class="button" id="sample-5-button">
+        Sample 5 (.usdz)
+      </button-->
     </div>
 
     <div class="center">
@@ -96,10 +102,11 @@
 
     <div style="margin: 2em auto; max-width: 900px">
       <pre><code class="language-javascript">
-var modelPlayer = this['js-3d-model-viewer'];
+var modelPlayer = js3dModelViewer;
 var viewerElement = document.getElementById('viewer')
 var scene = modelPlayer.prepareScene(viewerElement)
 modelPlayer.loadObject(scene, './assets/sample.obj')
+// or modelPlayer.loadGlb(scene, './assets/duck.glb')
 
 var fullScreenButton = document.getElementById('fullscreen-button')
 fullScreenButton.addEventListener('click', function () {
@@ -116,7 +123,7 @@ fullScreenButton.addEventListener('click', function () {
 
   <script src="./dist/js-3d-model-viewer.js"></script>
   <script>
-  var modelPlayer = this['js-3d-model-viewer']
+  var modelPlayer = js3dModelViewer
   var nameElement = document.getElementById('name')
   var loadingElement = document.getElementById('loading')
   var viewerElement = document.getElementById('viewer')
@@ -180,6 +187,36 @@ fullScreenButton.addEventListener('click', function () {
       './assets/sample_03.mtl',
       function () {
         nameElement.innerHTML = 'Sample 03'
+        loadingElement.innerHTML = ''
+    })
+  })
+
+  var sample4Button = document.getElementById('sample-4-button')
+  sample4Button.addEventListener('click', function () {
+    modelPlayer.clearScene(scene)
+    modelPlayer.resetCamera(scene)
+    modelPlayer.showGrid(scene)
+    nameElement.innerHTML = 'Sample 04'
+    modelPlayer.loadGlb(
+      scene, 
+      '/assets/duck.glb',
+      function () {
+        nameElement.innerHTML = 'Sample 04'
+        loadingElement.innerHTML = ''
+    })
+  })
+
+  var sample5Button = document.getElementById('sample-5-button')
+  sample5Button.addEventListener('click', function () {
+    modelPlayer.clearScene(scene)
+    modelPlayer.resetCamera(scene)
+    modelPlayer.showGrid(scene)
+    nameElement.innerHTML = 'Sample 05'
+    modelPlayer.loadUsdz(
+      scene, 
+      '/assets/sneakers.usdz',
+      function () {
+        nameElement.innerHTML = 'Sample 05'
         loadingElement.innerHTML = ''
     })
   })

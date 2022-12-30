@@ -1,7 +1,10 @@
 import * as THREE from 'three'
-import {MTLLoader, OBJLoader} from 'three-obj-mtl-loader'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
+// const USDZLoader = require('three-usdz-loader')
 
 const emitEvent = (element, eventName, data) => {
   element.dispatchEvent(new window.CustomEvent(eventName, {
@@ -171,6 +174,63 @@ const loadObject = (scene, url, materialUrl, callback) => {
 }
 
 /*
+ * Load mesh and materials (.glb) into the given scene.
+ */
+const loadGlb = (scene, url, callback) => {
+  const loader = new GLTFLoader()
+  if (scene.locked) return false
+  scene.locked = true
+
+  loader.load(url, (gltf) => {
+    scene.add(gltf.scene)
+    fitCameraToObject(scene.camera, gltf.scene, scene.lights)
+    scene.locked = false
+    if (callback) callback(gltf)
+    emitEvent(scene.element, 'loaded', {gltf})
+  },
+  (xhr) => {
+    if (xhr.total === 0) {
+      emitEvent(scene.element, 'loading', {
+        loaded: 0,
+        total: 100
+      })
+    } else {
+      emitEvent(scene.element, 'loading', {
+        loaded: xhr.loaded,
+        total: xhr.total
+      })
+    }
+  },
+  (err) => {
+    emitEvent(scene.element, 'error', {err})
+    if (callback) callback(err)
+  })
+
+  return loader
+}
+
+
+/*
+const loadUsdz = (scene, url, callback) => {
+  const loader = new USDZLoader()
+  if (scene.locked) return false
+  scene.locked = true
+
+  const group = new THREE.Group()
+  scene.add(group)
+  loader.loadFile(file, group)
+    .then(model => {
+      fitCameraToObject(scene.camera, model, scene.lights)
+      scene.locked = false
+      if (callback) callback(model)
+      emitEvent(scene.element, 'loaded', {model})
+      return Promise.resolve(model)
+    })
+}
+*/
+
+
+/*
  * Load an .obj file. If no materials is configured on the loader, it sets
  * a phong grey material by default.
  */
@@ -324,6 +384,8 @@ const resetObjectPosition = (boundingBox, object) => {
 export {
   prepareScene,
   loadObject,
+  loadGlb,
+  // loadUsdz,
   clearScene,
   resetCamera,
   goFullScreen,
