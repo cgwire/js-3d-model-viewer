@@ -24,6 +24,8 @@ const opts = {
 }
 const scene = modelPlayer.prepareScene(viewerElement, opts)
 modelPlayer.loadObject(scene, './assets/sample.obj') // Urls are fine here.
+// Alternatively you can load a .glb file
+modelPlayer.loadGlb(scene, './assets/sample.glb') // Urls are fine here.
 ```
 
 You're done!
@@ -45,18 +47,9 @@ modelPlayer.enableCache()
 // modelPlayer.disableCache()
 ```
 
-## Why
- 
-Animation studios want to be able to perform a quick review of 3D models. Displaying a
-model in the browser could help in solving this problem. On a broader aspect,
-there is no open source 3D model viewer. Which is sad when technologies like
-WebGL and Three.js allow to display easily 3D geometries.
-
-
 ## Development status
 
-* Currently the viewer supports only `.obj` files.
-* It cannot load textures or materials.
+* Currently the viewer supports only `.obj` and `.glb` files.
 * Unit tests are missing
 
 
