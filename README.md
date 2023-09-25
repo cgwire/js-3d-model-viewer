@@ -20,7 +20,8 @@ import modelPlayer from 'js-3d-model-viewer'
 const viewerElement = document.getElementById('viewer')
 const opts = {
   grid: true,
-  trackball: false
+  trackball: false,
+  background: 'rgb(100, 100, 100)'
 }
 const scene = modelPlayer.prepareScene(viewerElement, opts)
 modelPlayer.loadObject(scene, './assets/sample.obj') // Urls are fine here.
@@ -69,7 +70,7 @@ npm i
 All the code is in the `src/index.js` file. Once you did your changes you have to run the dev build:
 
 ```
-npm run dev
+npm run build
 ```
 
 Then you can test it with the demo page by starting a static webserver:

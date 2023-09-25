@@ -46,30 +46,59 @@ const setCamera = (aspect) => {
  */
 const setLights = (scene) => {
   const ambient = new THREE.AmbientLight(0xffffff, 0.15)
-  const backLight = new THREE.DirectionalLight(0xffffff, 0.3)
+  const backLight = new THREE.DirectionalLight(
+    new THREE.Color('#EEEEEE'),
+    0.8
+  )
+  const backLight2 = new THREE.DirectionalLight(
+    new THREE.Color('#EEEEEE'),
+    0.6
+  )
   const keyLight = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.3
+    0.9
+  )
+  const keyLight2 = new THREE.DirectionalLight(
+    new THREE.Color('#EEEEEE'),
+    0.4
+  )
+  const keyLight3 = new THREE.DirectionalLight(
+    new THREE.Color('#EEEEEE'),
+    0.4
   )
   const fillLight = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
     0.2
   )
 
-  keyLight.position.set(-100, 0, 100)
+  keyLight.position.set(100, 100, 100)
+  keyLight.target.position.set(0, 0, 0)
+  keyLight.castShadow = true
+  keyLight2.position.set(100, -100, 100)
+  keyLight2.target.position.set(0, 0, 0)
+  keyLight3.position.set(-100, 100, 100)
+  keyLight3.target.position.set(0, 0, 0)
+  keyLight.castShadow = true
   fillLight.position.set(100, 0, 100)
   backLight.position.set(100, 0, -100).normalize()
+  backLight.target.position.set(0, 0, 0)
+  backLight2.position.set(-100, 0, -100).normalize()
+  backLight2.target.position.set(0, 0, 0)
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6)
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.1)
   hemiLight.groundColor.setHSL(0.095, 1, 0.95)
   hemiLight.position.set(0, 100, 0)
   scene.add(hemiLight)
 
-  scene.add(ambient)
+  // scene.add(ambient)
   scene.add(keyLight)
-  scene.add(fillLight)
+  scene.add(keyLight2)
+  // scene.add(keyLight3)
   scene.add(backLight)
-
+  scene.add(backLight2)
+  /*
+  scene.add(fillLight)
+  */
   scene.lights = { keyLight, fillLight, backLight, ambient }
   return scene
 }
@@ -104,6 +133,9 @@ const setRenderer = (width, height) => {
   renderer.setSize(width, height)
   renderer.setPixelRatio(window.devicePixelRatio)
   renderer.setClearColor(new THREE.Color('hsl(0, 0%, 10%)'))
+  renderer.shadowMap.enabled = true
+  renderer.outputEncoding = THREE.sRGBEncoding
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap
   return renderer
 }
 
@@ -147,6 +179,7 @@ const prepareScene = (domElement, opts) => {
   )
   scene.camera = camera
   scene.element = domElement
+  if (opts.background) scene.background = new THREE.Color(opts.background)
   return scene
 }
 
@@ -182,6 +215,12 @@ const loadGlb = (scene, url, callback) => {
   scene.locked = true
 
   loader.load(url, (gltf) => {
+    gltf.scene.traverse(function (child) {
+      if (child.isMesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+      }
+    })
     scene.add(gltf.scene)
     fitCameraToObject(scene.camera, gltf.scene, scene.lights)
     scene.locked = false

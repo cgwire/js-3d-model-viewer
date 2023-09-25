@@ -104,7 +104,11 @@
       <pre><code class="language-javascript">
 var modelPlayer = this.Js3dModelViewer
 var viewerElement = document.getElementById('viewer')
-var scene = modelPlayer.prepareScene(viewerElement)
+var opts = {
+  grid: true,
+  background: 'rgb(80, 80, 80)'
+}
+var scene = modelPlayer.prepareScene(viewerElement, opts)
 modelPlayer.loadObject(scene, './assets/sample.obj')
 // or modelPlayer.loadGlb(scene, './assets/avocado.glb')
 
@@ -128,7 +132,8 @@ fullScreenButton.addEventListener('click', function () {
   var loadingElement = document.getElementById('loading')
   var viewerElement = document.getElementById('viewer')
   var scene = modelPlayer.prepareScene(viewerElement, {
-    grid: true
+    grid: true,
+    background: 'rgb(80, 80, 80)'
   })
 
   viewerElement.addEventListener('loading', function (event) {
