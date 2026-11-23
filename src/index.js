@@ -59,6 +59,7 @@ const setLights = (scene) => {
   hemiLight.groundColor.setHSL(0.095, 1, 0.95)
   hemiLight.position.set(0, 100, 0)
   keyLight.castShadow = true
+  keyLight.shadow.normalBias = 0.02 // avoids shadow acne (stripes) on flat faces
 
   const group = new THREE.Group()
   group.add(hemiLight, keyLight, keyLight2, backLight, backLight2)
@@ -121,7 +122,7 @@ const render = (element, renderer, scene, camera, isTrackball) => {
  * Build the scene in which the object will be displayed. It configures Three
  * properly and adds camera, lights and controls.
  */
-const prepareScene = (domElement, opts) => {
+const prepareScene = (domElement, opts = {}) => {
   const scene = new THREE.Scene()
   const element = domElement
   const width = element.offsetWidth

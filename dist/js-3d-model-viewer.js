@@ -65242,6 +65242,8 @@ void main() {
 	  hemiLight.groundColor.setHSL(0.095, 1, 0.95);
 	  hemiLight.position.set(0, 100, 0);
 	  keyLight.castShadow = true;
+	  keyLight.shadow.normalBias = 0.02; // avoids shadow acne (stripes) on flat faces
+
 	  const group = new Group();
 	  group.add(hemiLight, keyLight, keyLight2, backLight, backLight2);
 	  scene.add(group);
@@ -65305,7 +65307,7 @@ void main() {
 	 * Build the scene in which the object will be displayed. It configures Three
 	 * properly and adds camera, lights and controls.
 	 */
-	const prepareScene = (domElement, opts) => {
+	const prepareScene = (domElement, opts = {}) => {
 	  const scene = new Scene();
 	  const element = domElement;
 	  const width = element.offsetWidth;

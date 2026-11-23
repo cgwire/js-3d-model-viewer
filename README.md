@@ -90,7 +90,6 @@ modelPlayer.enableCache()
 ## Development status
 
 * Currently the viewer supports only `.obj` and `.glb` files.
-* Unit tests are missing
 
 
 ## Technologies
@@ -120,6 +119,9 @@ npm run serve
 
 You can see the result in the browser by connecting to
 [http://localhost:9080](http://localhost:9080).
+
+To run the tests, build the library and start the static webserver. Then open
+[http://localhost:9080/tests/](http://localhost:9080/tests/) in the browser.
 
 To build the projects for production you have to run the following command:
 
