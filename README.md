@@ -21,7 +21,8 @@ const viewerElement = document.getElementById('viewer')
 const opts = {
   grid: true,
   trackball: false,
-  background: 'rgb(100, 100, 100)'
+  background: 'rgb(100, 100, 100)',
+  up: 'y' // Set 'z' for models with the Z axis up (e.g. terrains).
 }
 const scene = modelPlayer.prepareScene(viewerElement, opts)
 modelPlayer.loadObject(scene, './assets/sample.obj') // Urls are fine here.
@@ -41,12 +42,16 @@ fullScreenButton.addEventListener('click', () => {
 })
 ```
 
+Some models use the Z axis as the up axis (for example, geodetic terrains).
+For these models, set the `up` option to `'z'`. The viewer then turns each
+model to show it on the grid. It does not change the model file.
+
 To change the lights, use `scene.lights`. It contains `group`, `hemiLight`,
 `keyLight`, `keyLight2`, `backLight` and `backLight2`. The `group` contains all
-the lights. For a model with the Z axis up, rotate the group:
+the lights. To turn all the lights, rotate the group:
 
 ```javascript
-scene.lights.group.rotation.x = -Math.PI / 2
+scene.lights.group.rotation.y = Math.PI / 4
 ```
 
 To move one light, set its position:

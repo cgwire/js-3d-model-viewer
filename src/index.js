@@ -142,6 +142,7 @@ const prepareScene = (domElement, opts) => {
   )
   scene.camera = camera
   scene.element = domElement
+  scene.upAxis = opts.up === 'z' ? 'z' : 'y'
   if (opts.background) scene.background = new THREE.Color(opts.background)
   return scene
 }
@@ -185,7 +186,7 @@ const loadGlb = (scene, url, callback) => {
       }
     })
     scene.add(gltf.scene)
-    fitCameraToObject(scene.camera, gltf.scene)
+    fitCameraToObject(scene, gltf.scene)
     scene.locked = false
     if (callback) callback(gltf)
     emitEvent(scene.element, 'loaded', {gltf})
@@ -223,7 +224,7 @@ const loadUsdz = (scene, url, callback) => {
   scene.add(group)
   loader.loadFile(file, group)
     .then(model => {
-      fitCameraToObject(scene.camera, model)
+      fitCameraToObject(scene, model)
       scene.locked = false
       if (callback) callback(model)
       emitEvent(scene.element, 'loaded', {model})
@@ -249,7 +250,7 @@ const loadObj = (objLoader, scene, url, callback) => {
       })
     }
     scene.add(obj)
-    fitCameraToObject(scene.camera, obj)
+    fitCameraToObject(scene, obj)
     scene.locked = false
     if (callback) callback(obj)
     emitEvent(scene.element, 'loaded', {obj})
@@ -348,7 +349,10 @@ const onWindowResize = (element, camera, renderer) => () => {
  * smaller to make sure the object fill all the space without getting outside
  * camera point of view.
  */
-const fitCameraToObject = (camera, object) => {
+const fitCameraToObject = (scene, object) => {
+  const camera = scene.camera
+  // Z-up models (e.g. geodetic terrains) are turned to the viewer Y-up axis
+  if (scene.upAxis === 'z') object.rotation.x = -Math.PI / 2
   const fov = camera.fov
   const boundingBox = new THREE.Box3()
   const size = new THREE.Vector3()

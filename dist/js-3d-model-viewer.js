@@ -65321,6 +65321,7 @@ void main() {
 	  window.addEventListener('resize', onWindowResize(element, camera, renderer), false);
 	  scene.camera = camera;
 	  scene.element = domElement;
+	  scene.upAxis = opts.up === 'z' ? 'z' : 'y';
 	  if (opts.background) scene.background = new Color(opts.background);
 	  return scene;
 	};
@@ -65361,7 +65362,7 @@ void main() {
 	      }
 	    });
 	    scene.add(gltf.scene);
-	    fitCameraToObject(scene.camera, gltf.scene);
+	    fitCameraToObject(scene, gltf.scene);
 	    scene.locked = false;
 	    if (callback) callback(gltf);
 	    emitEvent(scene.element, 'loaded', {
@@ -65399,7 +65400,7 @@ void main() {
 	  scene.add(group)
 	  loader.loadFile(file, group)
 	    .then(model => {
-	      fitCameraToObject(scene.camera, model)
+	      fitCameraToObject(scene, model)
 	      scene.locked = false
 	      if (callback) callback(model)
 	      emitEvent(scene.element, 'loaded', {model})
@@ -65425,7 +65426,7 @@ void main() {
 	      });
 	    }
 	    scene.add(obj);
-	    fitCameraToObject(scene.camera, obj);
+	    fitCameraToObject(scene, obj);
 	    scene.locked = false;
 	    if (callback) callback(obj);
 	    emitEvent(scene.element, 'loaded', {
@@ -65525,7 +65526,10 @@ void main() {
 	 * smaller to make sure the object fill all the space without getting outside
 	 * camera point of view.
 	 */
-	const fitCameraToObject = (camera, object) => {
+	const fitCameraToObject = (scene, object) => {
+	  const camera = scene.camera;
+	  // Z-up models (e.g. geodetic terrains) are turned to the viewer Y-up axis
+	  if (scene.upAxis === 'z') object.rotation.x = -Math.PI / 2;
 	  const fov = camera.fov;
 	  const boundingBox = new Box3();
 	  const size = new Vector3();
