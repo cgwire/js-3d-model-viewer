@@ -4,7 +4,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
-// const USDZLoader = require('three-usdz-loader')
+import { USDLoader } from 'three/examples/jsm/loaders/USDLoader.js'
 
 const emitEvent = (element, eventName, data) => {
   element.dispatchEvent(new window.CustomEvent(eventName, {
@@ -149,6 +149,25 @@ const prepareScene = (domElement, opts = {}) => {
 }
 
 /*
+ * Loader callback that sends a loading event with the progress.
+ */
+const onProgress = (scene) => (xhr) => {
+  emitEvent(scene.element, 'loading', {
+    loaded: xhr.total === 0 ? 0 : xhr.loaded,
+    total: xhr.total === 0 ? 100 : xhr.total
+  })
+}
+
+/*
+ * Loader callback that unlocks the scene and sends an error event.
+ */
+const onError = (scene, callback) => (err) => {
+  scene.locked = false
+  emitEvent(scene.element, 'error', {err})
+  if (callback) callback(err)
+}
+
+/*
  * Load a mesh (.obj) into the given scene. Materials can be specified too
  * (.mtl).
  */
@@ -192,47 +211,39 @@ const loadGlb = (scene, url, callback) => {
     if (callback) callback(gltf)
     emitEvent(scene.element, 'loaded', {gltf})
   },
-  (xhr) => {
-    if (xhr.total === 0) {
-      emitEvent(scene.element, 'loading', {
-        loaded: 0,
-        total: 100
-      })
-    } else {
-      emitEvent(scene.element, 'loading', {
-        loaded: xhr.loaded,
-        total: xhr.total
-      })
-    }
-  },
-  (err) => {
-    scene.locked = false
-    emitEvent(scene.element, 'error', {err})
-    if (callback) callback(err)
-  })
+  onProgress(scene),
+  onError(scene, callback))
 
   return loader
 }
 
 
 /*
-const loadUsdz = (scene, url, callback) => {
-  const loader = new USDZLoader()
+ * Load a USD file (.usd, .usda, .usdc or .usdz) into the given scene.
+ */
+const loadUsd = (scene, url, callback) => {
+  const loader = new USDLoader()
   if (scene.locked) return false
   scene.locked = true
 
-  const group = new THREE.Group()
-  scene.add(group)
-  loader.loadFile(file, group)
-    .then(model => {
-      fitCameraToObject(scene, model)
-      scene.locked = false
-      if (callback) callback(model)
-      emitEvent(scene.element, 'loaded', {model})
-      return Promise.resolve(model)
+  loader.load(url, (model) => {
+    model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true
+        child.receiveShadow = true
+      }
     })
+    scene.add(model)
+    fitCameraToObject(scene, model)
+    scene.locked = false
+    if (callback) callback(model)
+    emitEvent(scene.element, 'loaded', {model})
+  },
+  onProgress(scene),
+  onError(scene, callback))
+
+  return loader
 }
-*/
 
 
 /*
@@ -256,24 +267,8 @@ const loadObj = (objLoader, scene, url, callback) => {
     if (callback) callback(obj)
     emitEvent(scene.element, 'loaded', {obj})
   },
-  (xhr) => {
-    if (xhr.total === 0) {
-      emitEvent(scene.element, 'loading', {
-        loaded: 0,
-        total: 100
-      })
-    } else {
-      emitEvent(scene.element, 'loading', {
-        loaded: xhr.loaded,
-        total: xhr.total
-      })
-    }
-  },
-  (err) => {
-    scene.locked = false
-    emitEvent(scene.element, 'error', {err})
-    if (callback) callback(err)
-  })
+  onProgress(scene),
+  onError(scene, callback))
 }
 
 /*
@@ -388,7 +383,7 @@ export {
   prepareScene,
   loadObject,
   loadGlb,
-  // loadUsdz,
+  loadUsd,
   clearScene,
   resetCamera,
   goFullScreen,

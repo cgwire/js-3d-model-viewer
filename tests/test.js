@@ -134,6 +134,47 @@ describe('loadGlb', function () {
   })
 })
 
+describe('loadUsd', function () {
+  this.timeout(20000)
+
+  afterEach(function () {
+    modelPlayer.clearScene(scene)
+  })
+
+  const loadUsd = (url) => new Promise((resolve) => {
+    modelPlayer.loadUsd(scene, url, resolve)
+  })
+
+  it('loads a .usdz file (with a .usdc layer) and shows it in the camera view', async function () {
+    const model = await loadUsd('../assets/sneakers.usdz')
+    expect(models(scene)).to.deep.eq([model])
+    expect(scene.locked).to.be.false
+    expect(isInView(scene.camera, model)).to.be.true
+  })
+
+  it('loads a .usda file and turns its Z-up axis to Y-up', async function () {
+    const model = await loadUsd('../assets/cube.usda')
+    expect(models(scene)).to.deep.eq([model])
+    // The box is 1 x 1 x 2 with Z up: in the viewer, its height is on Y.
+    model.updateMatrixWorld(true)
+    const mesh = model.getObjectByProperty('isMesh', true)
+    mesh.geometry.computeBoundingBox()
+    const box = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld)
+    expect(box.max.y - box.min.y).to.be.closeTo(2, 1e-6)
+    expect(box.max.z - box.min.z).to.be.closeTo(1, 1e-6)
+    expect(isInView(scene.camera, model)).to.be.true
+  })
+
+  it('sends an error event and unlocks the scene if the file is missing', async function () {
+    const errorEvent = new Promise((resolve) => {
+      viewerElement.addEventListener('error', resolve, { once: true })
+    })
+    await loadUsd('../assets/missing.usdz')
+    await errorEvent
+    expect(scene.locked).to.be.false
+  })
+})
+
 describe('up option', function () {
   this.timeout(10000)
 

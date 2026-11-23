@@ -28,6 +28,7 @@ const scene = modelPlayer.prepareScene(viewerElement, opts)
 modelPlayer.loadObject(scene, './assets/sample.obj') // Urls are fine here.
 // Alternatively you can load a .glb file
 modelPlayer.loadGlb(scene, './assets/sample.glb') // Urls are fine here.
+modelPlayer.loadUsd(scene, './assets/sample.usdz') // .usd, .usda, .usdc or .usdz
 ```
 
 You're done!
@@ -45,6 +46,8 @@ fullScreenButton.addEventListener('click', () => {
 Some models use the Z axis as the up axis (for example, geodetic terrains).
 For these models, set the `up` option to `'z'`. The viewer then turns each
 model to show it on the grid. It does not change the model file.
+The `.glb` files always use the Y axis up. The USD files contain their up axis
+and the viewer reads it. For these files, do not use the `up` option.
 
 To change the lights, use `scene.lights`. It contains `group`, `hemiLight`,
 `keyLight`, `keyLight2`, `backLight` and `backLight2`. The `group` contains all
@@ -89,7 +92,7 @@ modelPlayer.enableCache()
 
 ## Development status
 
-* Currently the viewer supports only `.obj` and `.glb` files.
+* The viewer supports `.obj`, `.glb`, `.usd`, `.usda`, `.usdc` and `.usdz` files.
 
 
 ## Technologies

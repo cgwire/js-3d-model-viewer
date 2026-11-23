@@ -89,9 +89,9 @@
       <button class="button" id="sample-5-button">
         Sample 5 (.glb)
       </button>
-      <!--button class="button" id="sample-6-button">
+      <button class="button" id="sample-6-button">
         Sample 6 (.usdz)
-      </button-->
+      </button>
     </div>
 
     <div class="center">
@@ -189,6 +189,11 @@ fullScreenButton.addEventListener('click', function () {
   document.getElementById('sample-5-button').addEventListener('click', function () {
     loadSample('Sample 05', function (done) {
       modelPlayer.loadGlb(scene, './assets/room.glb', done)
+    })
+  })
+  document.getElementById('sample-6-button').addEventListener('click', function () {
+    loadSample('Sample 06', function (done) {
+      modelPlayer.loadUsd(scene, './assets/sneakers.usdz', done)
     })
   })
 
