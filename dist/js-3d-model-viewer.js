@@ -42902,6 +42902,7 @@
 	      });
 	    }
 	  }, err => {
+	    scene.locked = false;
 	    emitEvent(scene.element, 'error', {
 	      err
 	    });
@@ -42965,6 +42966,7 @@
 	      });
 	    }
 	  }, err => {
+	    scene.locked = false;
 	    emitEvent(scene.element, 'error', {
 	      err
 	    });
@@ -42976,7 +42978,7 @@
 	 * Remove all meshes from the scene.
 	 */
 	const clearScene = scene => {
-	  scene.children.forEach(obj => {
+	  [...scene.children].forEach(obj => {
 	    if (obj.type === 'Group') {
 	      scene.remove(obj);
 	    }
@@ -43012,19 +43014,14 @@
 	 * Display the viewer through the fullscreen feature of the browser.
 	 */
 	const goFullScreen = element => {
-	  const hasWebkitFullScreen = ('webkitCancelFullScreen' in document);
-	  const hasMozFullScreen = ('mozCancelFullScreen' in document);
-	  if (hasWebkitFullScreen) {
-	    element.webkitRequestFullScreen();
-	    const evt = window.document.createEvent('UIEvents');
-	    evt.initUIEvent('resize', true, false, window, 0);
-	    window.dispatchEvent(evt);
+	  if (element.requestFullscreen) {
+	    element.requestFullscreen();
 	    return true;
-	  } else if (hasMozFullScreen) {
-	    return element.mozRequestFullScreen();
-	  } else {
-	    return false;
+	  } else if (element.webkitRequestFullscreen) {
+	    element.webkitRequestFullscreen();
+	    return true;
 	  }
+	  return false;
 	};
 
 	/*
@@ -43033,7 +43030,7 @@
 	 */
 	const onWindowResize = (element, camera, renderer) => () => {
 	  const resize = () => {
-	    const isFullscreen = !window.screenTop && !window.screenY;
+	    const isFullscreen = (document.fullscreenElement || document.webkitFullscreenElement) === element;
 	    const width = isFullscreen ? window.innerWidth : element.offsetWidth;
 	    const height = isFullscreen ? window.innerHeight : element.offsetHeight;
 	    const aspect = width / height;
@@ -43057,9 +43054,13 @@
 	  boundingBox.setFromObject(object);
 	  resetObjectPosition(boundingBox, object);
 	  boundingBox.getSize(size);
-	  let cameraZ = Math.abs(size.y / 2 * Math.tan(fov * 2));
-	  const z = Math.max(cameraZ, size.z) * 1.5;
-	  camera.position.z = z;
+	  const fitSize = Math.max(size.y, size.x / camera.aspect);
+	  const cameraZ = fitSize / 2 / Math.tan(MathUtils.degToRad(fov / 2));
+	  const z = (cameraZ + size.z / 2) * 1.2;
+	  // object sits on the grid, so aim at its middle height
+	  camera.position.set(0, size.y / 2, z);
+	  camera.controls.target.set(0, size.y / 2, 0);
+	  camera.controls.update();
 	  camera.updateProjectionMatrix();
 	  lights.keyLight.position.set(-z, 0, z);
 	  lights.fillLight.position.set(z, 0, z);
@@ -43067,14 +43068,14 @@
 	};
 
 	/*
-	 * Move object to the center.
+	 * Center object on X and Z, and put its base on the grid (Y = 0).
 	 */
 	const resetObjectPosition = (boundingBox, object) => {
 	  const size = new Vector3();
 	  boundingBox.setFromObject(object);
 	  boundingBox.getSize(size);
 	  object.position.x = -boundingBox.min.x - size.x / 2;
-	  object.position.y = -boundingBox.min.y - size.y / 2;
+	  object.position.y = -boundingBox.min.y;
 	  object.position.z = -boundingBox.min.z - size.z / 2;
 	  object.rotation.z = 0;
 	};

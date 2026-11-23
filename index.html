@@ -92,9 +92,10 @@
     </div>
 
     <div class="center">
-      <input class="mr2" id="grid-button" type="checkbox" checked>
+      <label class="mr2">
+        <input id="grid-button" type="checkbox" checked>
         Grid
-      </input>
+      </label>
       <button class="button" id="fullscreen-button">
         Go Full Screen
       </button>
@@ -144,98 +145,52 @@ fullScreenButton.addEventListener('click', function () {
     loadingElement.innerHTML = progress + '%'
   })
 
-  modelPlayer.loadObject(scene, './assets/sample.obj', null, function () {
-    nameElement.innerHTML = 'Sample 01'
-    loadingElement.innerHTML = ''
-  })
+  var gridCheckbox = document.getElementById('grid-button')
 
-  var fullScreenButton = document.getElementById('fullscreen-button')
-  fullScreenButton.addEventListener('click', function () {
-    modelPlayer.goFullScreen(viewerElement)
-  })
-
-  var sample1Button = document.getElementById('sample-1-button')
-  sample1Button.addEventListener('click', function () {
+  function loadSample (name, load) {
+    if (scene.locked) return // a model is still loading
     modelPlayer.clearScene(scene)
     modelPlayer.resetCamera(scene)
-    modelPlayer.showGrid(scene)
-    nameElement.innerHTML = 'Sample 01'
-    modelPlayer.loadObject(scene, './assets/sample.obj', null, function () {
+    nameElement.innerHTML = name
+    load(function () {
+      nameElement.innerHTML = name
       loadingElement.innerHTML = ''
     })
-  })
-
-  var sample2Button = document.getElementById('sample-2-button')
-  sample2Button.addEventListener('click', function () {
-    modelPlayer.clearScene(scene)
-    modelPlayer.resetCamera(scene)
-    modelPlayer.showGrid(scene)
-    nameElement.innerHTML = 'Sample 02'
-    modelPlayer.loadObject(
-      scene, 
-      './assets/sample_02.obj', 
-      './assets/sample_02.mtl',
-      function () {
-        loadingElement.innerHTML = ''
-    })
-  })
-
-  var sample3Button = document.getElementById('sample-3-button')
-  sample3Button.addEventListener('click', function () {
-    modelPlayer.clearScene(scene)
-    modelPlayer.resetCamera(scene)
-    modelPlayer.showGrid(scene)
-    nameElement.innerHTML = 'Sample 03'
-    modelPlayer.loadObject(
-      scene, 
-      './assets/sample_03.obj',
-      './assets/sample_03.mtl',
-      function () {
-        nameElement.innerHTML = 'Sample 03'
-        loadingElement.innerHTML = ''
-    })
-  })
-
-  var sample4Button = document.getElementById('sample-4-button')
-  sample4Button.addEventListener('click', function () {
-    modelPlayer.clearScene(scene)
-    modelPlayer.resetCamera(scene)
-    modelPlayer.showGrid(scene)
-    nameElement.innerHTML = 'Sample 04'
-    modelPlayer.loadGlb(
-      scene, 
-      './assets/avocado.glb',
-      function () {
-        nameElement.innerHTML = 'Sample 04'
-        loadingElement.innerHTML = ''
-    })
-  })
-
-  /*
-  var sample5Button = document.getElementById('sample-5-button')
-  sample5Button.addEventListener('click', function () {
-    modelPlayer.clearScene(scene)
-    modelPlayer.resetCamera(scene)
-    modelPlayer.showGrid(scene)
-    nameElement.innerHTML = 'Sample 05'
-    modelPlayer.loadUsdz(
-      scene, 
-      '/assets/sneakers.usdz',
-      function () {
-        nameElement.innerHTML = 'Sample 05'
-        loadingElement.innerHTML = ''
-    })
-  })
-  */
-
-  var gridCheckbox = document.querySelector('#grid-button');
-  gridCheckbox.onchange = function() {
-  if(gridCheckbox.checked) {
-    modelPlayer.showGrid(scene)
-  } else {
-    modelPlayer.hideGrid(scene)
   }
-};
+
+  function loadObj (name, url, mtlUrl) {
+    loadSample(name, function (done) {
+      modelPlayer.loadObject(scene, url, mtlUrl, done)
+    })
+  }
+
+  loadObj('Sample 01', './assets/sample.obj', null)
+
+  document.getElementById('fullscreen-button').addEventListener('click', function () {
+    modelPlayer.goFullScreen(viewerElement)
+  })
+  document.getElementById('sample-1-button').addEventListener('click', function () {
+    loadObj('Sample 01', './assets/sample.obj', null)
+  })
+  document.getElementById('sample-2-button').addEventListener('click', function () {
+    loadObj('Sample 02', './assets/sample_02.obj', './assets/sample_02.mtl')
+  })
+  document.getElementById('sample-3-button').addEventListener('click', function () {
+    loadObj('Sample 03', './assets/sample_03.obj', './assets/sample_03.mtl')
+  })
+  document.getElementById('sample-4-button').addEventListener('click', function () {
+    loadSample('Sample 04', function (done) {
+      modelPlayer.loadGlb(scene, './assets/avocado.glb', done)
+    })
+  })
+
+  gridCheckbox.addEventListener('change', function () {
+    if (gridCheckbox.checked) {
+      modelPlayer.showGrid(scene)
+    } else {
+      modelPlayer.hideGrid(scene)
+    }
+  })
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.js"></script>
