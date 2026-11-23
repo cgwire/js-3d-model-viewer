@@ -34112,45 +34112,6 @@
 	}
 
 	/**
-	 * This light globally illuminates all objects in the scene equally.
-	 *
-	 * It cannot be used to cast shadows as it does not have a direction.
-	 *
-	 * ```js
-	 * const light = new THREE.AmbientLight( 0x404040 ); // soft white light
-	 * scene.add( light );
-	 * ```
-	 *
-	 * @augments Light
-	 */
-	class AmbientLight extends Light {
-
-		/**
-		 * Constructs a new ambient light.
-		 *
-		 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
-		 * @param {number} [intensity=1] - The light's strength/intensity.
-		 */
-		constructor( color, intensity ) {
-
-			super( color, intensity );
-
-			/**
-			 * This flag can be used for type testing.
-			 *
-			 * @type {boolean}
-			 * @readonly
-			 * @default true
-			 */
-			this.isAmbientLight = true;
-
-			this.type = 'AmbientLight';
-
-		}
-
-	}
-
-	/**
 	 * A class with loader utility functions.
 	 */
 	class LoaderUtils {
@@ -65264,48 +65225,33 @@ void main() {
 	};
 
 	/*
-	 * Add lights to given scene (ambient and spots).
+	 * Add lights to given scene. They are grouped in scene.lights.group, so the
+	 * user can move one light or rotate all of them (e.g. for Z-up models).
 	 */
 	const setLights = scene => {
-	  const ambient = new AmbientLight(0xffffff, 0.5);
-	  const backLight = new DirectionalLight(new Color('#EEEEEE'), 2.5);
-	  const backLight2 = new DirectionalLight(new Color('#EEEEEE'), 1.9);
-	  const keyLight = new DirectionalLight(new Color('#EEEEEE'), 2.8);
-	  const keyLight2 = new DirectionalLight(new Color('#EEEEEE'), 1.25);
-	  const keyLight3 = new DirectionalLight(new Color('#EEEEEE'), 1.25);
-	  const fillLight = new DirectionalLight(new Color('#EEEEEE'), 0.6);
-	  keyLight.position.set(100, 100, 100);
-	  keyLight.target.position.set(0, 0, 0);
-	  keyLight.castShadow = true;
-	  keyLight2.position.set(100, -100, 100);
-	  keyLight2.target.position.set(0, 0, 0);
-	  keyLight3.position.set(-100, 100, 100);
-	  keyLight3.target.position.set(0, 0, 0);
-	  keyLight.castShadow = true;
-	  fillLight.position.set(100, 0, 100);
-	  backLight.position.set(100, 0, -100).normalize();
-	  backLight.target.position.set(0, 0, 0);
-	  backLight2.position.set(-100, 0, -100).normalize();
-	  backLight2.target.position.set(0, 0, 0);
+	  const directionalLight = (intensity, x, y, z) => {
+	    const light = new DirectionalLight(new Color('#EEEEEE'), intensity);
+	    light.position.set(x, y, z);
+	    return light;
+	  };
+	  const keyLight = directionalLight(2.8, -100, 0, 100);
+	  const keyLight2 = directionalLight(1.25, 100, -100, 100);
+	  const backLight = directionalLight(2.5, 100, 0, -100);
+	  const backLight2 = directionalLight(1.9, -100, 0, -100);
 	  const hemiLight = new HemisphereLight(0xffffff, 0xffffff, 0.3);
 	  hemiLight.groundColor.setHSL(0.095, 1, 0.95);
 	  hemiLight.position.set(0, 100, 0);
-	  scene.add(hemiLight);
-
-	  // scene.add(ambient)
-	  scene.add(keyLight);
-	  scene.add(keyLight2);
-	  // scene.add(keyLight3)
-	  scene.add(backLight);
-	  scene.add(backLight2);
-	  /*
-	  scene.add(fillLight)
-	  */
+	  keyLight.castShadow = true;
+	  const group = new Group();
+	  group.add(hemiLight, keyLight, keyLight2, backLight, backLight2);
+	  scene.add(group);
 	  scene.lights = {
+	    group,
+	    hemiLight,
 	    keyLight,
-	    fillLight,
+	    keyLight2,
 	    backLight,
-	    ambient
+	    backLight2
 	  };
 	  return scene;
 	};
@@ -65415,7 +65361,7 @@ void main() {
 	      }
 	    });
 	    scene.add(gltf.scene);
-	    fitCameraToObject(scene.camera, gltf.scene, scene.lights);
+	    fitCameraToObject(scene.camera, gltf.scene);
 	    scene.locked = false;
 	    if (callback) callback(gltf);
 	    emitEvent(scene.element, 'loaded', {
@@ -65453,7 +65399,7 @@ void main() {
 	  scene.add(group)
 	  loader.loadFile(file, group)
 	    .then(model => {
-	      fitCameraToObject(scene.camera, model, scene.lights)
+	      fitCameraToObject(scene.camera, model)
 	      scene.locked = false
 	      if (callback) callback(model)
 	      emitEvent(scene.element, 'loaded', {model})
@@ -65479,7 +65425,7 @@ void main() {
 	      });
 	    }
 	    scene.add(obj);
-	    fitCameraToObject(scene.camera, obj, scene.lights);
+	    fitCameraToObject(scene.camera, obj);
 	    scene.locked = false;
 	    if (callback) callback(obj);
 	    emitEvent(scene.element, 'loaded', {
@@ -65511,7 +65457,7 @@ void main() {
 	 */
 	const clearScene = scene => {
 	  [...scene.children].forEach(obj => {
-	    if (obj.type === 'Group') {
+	    if (obj.type === 'Group' && obj !== scene.lights.group) {
 	      scene.remove(obj);
 	    }
 	  });
@@ -65579,7 +65525,7 @@ void main() {
 	 * smaller to make sure the object fill all the space without getting outside
 	 * camera point of view.
 	 */
-	const fitCameraToObject = (camera, object, lights) => {
+	const fitCameraToObject = (camera, object) => {
 	  const fov = camera.fov;
 	  const boundingBox = new Box3();
 	  const size = new Vector3();
@@ -65594,9 +65540,6 @@ void main() {
 	  camera.controls.target.set(0, size.y / 2, 0);
 	  camera.controls.update();
 	  camera.updateProjectionMatrix();
-	  lights.keyLight.position.set(-z, 0, z);
-	  lights.fillLight.position.set(z, 0, z);
-	  lights.backLight.position.set(z, 0, -z);
 	};
 
 	/*

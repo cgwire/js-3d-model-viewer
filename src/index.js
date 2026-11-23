@@ -42,64 +42,28 @@ const setCamera = (aspect) => {
 }
 
 /*
- * Add lights to given scene (ambient and spots).
+ * Add lights to given scene. They are grouped in scene.lights.group, so the
+ * user can move one light or rotate all of them (e.g. for Z-up models).
  */
 const setLights = (scene) => {
-  const ambient = new THREE.AmbientLight(0xffffff, 0.5)
-  const backLight = new THREE.DirectionalLight(
-    new THREE.Color('#EEEEEE'),
-    2.5
-  )
-  const backLight2 = new THREE.DirectionalLight(
-    new THREE.Color('#EEEEEE'),
-    1.9
-  )
-  const keyLight = new THREE.DirectionalLight(
-    new THREE.Color('#EEEEEE'),
-    2.8
-  )
-  const keyLight2 = new THREE.DirectionalLight(
-    new THREE.Color('#EEEEEE'),
-    1.25
-  )
-  const keyLight3 = new THREE.DirectionalLight(
-    new THREE.Color('#EEEEEE'),
-    1.25
-  )
-  const fillLight = new THREE.DirectionalLight(
-    new THREE.Color('#EEEEEE'),
-    0.6
-  )
-
-  keyLight.position.set(100, 100, 100)
-  keyLight.target.position.set(0, 0, 0)
-  keyLight.castShadow = true
-  keyLight2.position.set(100, -100, 100)
-  keyLight2.target.position.set(0, 0, 0)
-  keyLight3.position.set(-100, 100, 100)
-  keyLight3.target.position.set(0, 0, 0)
-  keyLight.castShadow = true
-  fillLight.position.set(100, 0, 100)
-  backLight.position.set(100, 0, -100).normalize()
-  backLight.target.position.set(0, 0, 0)
-  backLight2.position.set(-100, 0, -100).normalize()
-  backLight2.target.position.set(0, 0, 0)
-
+  const directionalLight = (intensity, x, y, z) => {
+    const light = new THREE.DirectionalLight(new THREE.Color('#EEEEEE'), intensity)
+    light.position.set(x, y, z)
+    return light
+  }
+  const keyLight = directionalLight(2.8, -100, 0, 100)
+  const keyLight2 = directionalLight(1.25, 100, -100, 100)
+  const backLight = directionalLight(2.5, 100, 0, -100)
+  const backLight2 = directionalLight(1.9, -100, 0, -100)
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.3)
   hemiLight.groundColor.setHSL(0.095, 1, 0.95)
   hemiLight.position.set(0, 100, 0)
-  scene.add(hemiLight)
+  keyLight.castShadow = true
 
-  // scene.add(ambient)
-  scene.add(keyLight)
-  scene.add(keyLight2)
-  // scene.add(keyLight3)
-  scene.add(backLight)
-  scene.add(backLight2)
-  /*
-  scene.add(fillLight)
-  */
-  scene.lights = { keyLight, fillLight, backLight, ambient }
+  const group = new THREE.Group()
+  group.add(hemiLight, keyLight, keyLight2, backLight, backLight2)
+  scene.add(group)
+  scene.lights = { group, hemiLight, keyLight, keyLight2, backLight, backLight2 }
   return scene
 }
 
@@ -221,7 +185,7 @@ const loadGlb = (scene, url, callback) => {
       }
     })
     scene.add(gltf.scene)
-    fitCameraToObject(scene.camera, gltf.scene, scene.lights)
+    fitCameraToObject(scene.camera, gltf.scene)
     scene.locked = false
     if (callback) callback(gltf)
     emitEvent(scene.element, 'loaded', {gltf})
@@ -259,7 +223,7 @@ const loadUsdz = (scene, url, callback) => {
   scene.add(group)
   loader.loadFile(file, group)
     .then(model => {
-      fitCameraToObject(scene.camera, model, scene.lights)
+      fitCameraToObject(scene.camera, model)
       scene.locked = false
       if (callback) callback(model)
       emitEvent(scene.element, 'loaded', {model})
@@ -285,7 +249,7 @@ const loadObj = (objLoader, scene, url, callback) => {
       })
     }
     scene.add(obj)
-    fitCameraToObject(scene.camera, obj, scene.lights)
+    fitCameraToObject(scene.camera, obj)
     scene.locked = false
     if (callback) callback(obj)
     emitEvent(scene.element, 'loaded', {obj})
@@ -315,7 +279,7 @@ const loadObj = (objLoader, scene, url, callback) => {
  */
 const clearScene = (scene) => {
   [...scene.children].forEach((obj) => {
-    if (obj.type === 'Group') {
+    if (obj.type === 'Group' && obj !== scene.lights.group) {
       scene.remove(obj)
     }
   })
@@ -384,7 +348,7 @@ const onWindowResize = (element, camera, renderer) => () => {
  * smaller to make sure the object fill all the space without getting outside
  * camera point of view.
  */
-const fitCameraToObject = (camera, object, lights) => {
+const fitCameraToObject = (camera, object) => {
   const fov = camera.fov
   const boundingBox = new THREE.Box3()
   const size = new THREE.Vector3()
@@ -400,10 +364,6 @@ const fitCameraToObject = (camera, object, lights) => {
   camera.controls.target.set(0, size.y / 2, 0)
   camera.controls.update()
   camera.updateProjectionMatrix()
-
-  lights.keyLight.position.set(-z, 0, z)
-  lights.fillLight.position.set(z, 0, z)
-  lights.backLight.position.set(z, 0, -z)
 }
 
 /*

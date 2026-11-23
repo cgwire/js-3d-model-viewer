@@ -41,6 +41,20 @@ fullScreenButton.addEventListener('click', () => {
 })
 ```
 
+To change the lights, use `scene.lights`. It contains `group`, `hemiLight`,
+`keyLight`, `keyLight2`, `backLight` and `backLight2`. The `group` contains all
+the lights. For a model with the Z axis up, rotate the group:
+
+```javascript
+scene.lights.group.rotation.x = -Math.PI / 2
+```
+
+To move one light, set its position:
+
+```javascript
+scene.lights.keyLight.position.set(0, 100, 100)
+```
+
 If you want to enable the underlying Thee.js cache:
 
 ```
@@ -64,6 +78,9 @@ modelPlayer.enableCache()
 * The viewer calculates the camera position with a different formula. Thus,
   the models can show larger or smaller than in version 0.2.
 * The package does not include the `three-orbit-controls` dependency.
+* `scene.lights` does not contain `fillLight` and `ambient`. It contains all
+  the lights of the scene and a `group` that contains them.
+* The viewer does not move the lights when it loads a model.
 
 ## Development status
 
