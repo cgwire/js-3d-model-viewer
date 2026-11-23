@@ -48,6 +48,23 @@ modelPlayer.enableCache()
 // modelPlayer.disableCache()
 ```
 
+## Breaking changes
+
+### 0.3.0
+
+* The viewer uses Three.js 0.187. Version 0.2 uses Three.js 0.148.
+* If you add objects, lights or materials to the scene, read the
+  [Three.js migration guide](https://github.com/mrdoob/three.js/wiki/Migration-Guide).
+* Lights use physical units. To keep the same light level, multiply the
+  intensity of your lights by approximately 3.14 (π).
+* The viewer does not set `renderer.outputEncoding`. Three.js uses the sRGB
+  color space by default.
+* `goFullScreen` uses the standard Fullscreen API. On WebKit browsers, it uses
+  the WebKit API. It does not use the `mozRequestFullScreen` API.
+* The viewer calculates the camera position with a different formula. Thus,
+  the models can show larger or smaller than in version 0.2.
+* The package does not include the `three-orbit-controls` dependency.
+
 ## Development status
 
 * Currently the viewer supports only `.obj` and `.glb` files.

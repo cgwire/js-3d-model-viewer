@@ -45,30 +45,30 @@ const setCamera = (aspect) => {
  * Add lights to given scene (ambient and spots).
  */
 const setLights = (scene) => {
-  const ambient = new THREE.AmbientLight(0xffffff, 0.15)
+  const ambient = new THREE.AmbientLight(0xffffff, 0.5)
   const backLight = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.8
+    2.5
   )
   const backLight2 = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.6
+    1.9
   )
   const keyLight = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.9
+    2.8
   )
   const keyLight2 = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.4
+    1.25
   )
   const keyLight3 = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.4
+    1.25
   )
   const fillLight = new THREE.DirectionalLight(
     new THREE.Color('#EEEEEE'),
-    0.2
+    0.6
   )
 
   keyLight.position.set(100, 100, 100)
@@ -85,7 +85,7 @@ const setLights = (scene) => {
   backLight2.position.set(-100, 0, -100).normalize()
   backLight2.target.position.set(0, 0, 0)
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.1)
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.3)
   hemiLight.groundColor.setHSL(0.095, 1, 0.95)
   hemiLight.position.set(0, 100, 0)
   scene.add(hemiLight)
@@ -134,8 +134,7 @@ const setRenderer = (width, height) => {
   renderer.setPixelRatio(window.devicePixelRatio)
   renderer.setClearColor(new THREE.Color('hsl(0, 0%, 10%)'))
   renderer.shadowMap.enabled = true
-  renderer.outputEncoding = THREE.sRGBEncoding
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  renderer.shadowMap.type = THREE.PCFShadowMap
   return renderer
 }
 

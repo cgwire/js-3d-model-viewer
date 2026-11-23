@@ -27,16 +27,15 @@
   },
   "homepage": "https://github.com/cgwire/js-3d-model-viewer#readme",
   "dependencies": {
-    "three": "0.148.0",
-    "three-orbit-controls": "^82.1.0"
+    "three": "^0.187.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.20.2",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-terser": "^0.2.1",
-    "rollup": "^3.8.1",
+    "@babel/preset-env": "^7.29.14",
+    "@rollup/plugin-babel": "^7.1.0",
+    "@rollup/plugin-commonjs": "^29.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.2",
+    "rollup": "^4.68.8",
     "static-server": "^2.2.1"
   }
 }
